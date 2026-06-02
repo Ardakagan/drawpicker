@@ -18,8 +18,6 @@ const ACCENT: Record<string, any> = {
     ruleOn: "border-sky-500 bg-sky-500/10",
     chk: "bg-sky-500",
     check: "text-sky-400",
-    cardFrom: "from-sky-500/10 to-cyan-500/5 border border-sky-500/40",
-    certBorder: "border-sky-500/40",
   },
   purple: {
     text: "text-purple-400",
@@ -31,32 +29,10 @@ const ACCENT: Record<string, any> = {
     ruleOn: "border-purple-500 bg-purple-500/10",
     chk: "bg-purple-500",
     check: "text-purple-400",
-    cardFrom: "from-purple-500/10 to-cyan-500/5 border border-purple-500/40",
-    certBorder: "border-purple-500/40",
   },
 };
 
-export type RuleDef = {
-  key: keyof Rules;
-  fixed?: boolean;
-  default?: boolean;
-};
-
-export type GiveawayConfig = {
-  platform: Platform;
-  accent: "sky" | "purple";
-  icon: string;
-  titleKey: string;
-  subKey: string;
-  inputKey: string;
-  inputPhKey: string;
-  ruleDefs: RuleDef[];
-  showKeyword?: boolean;
-  showMinLen?: boolean;
-  showMinFollowers?: boolean;
-};
-
-export default function GiveawayPage({ config }: { config: GiveawayConfig }) {
+export default function GiveawayPage({ config }: any) {
   const a = ACCENT[config.accent];
 
   const [lang, setLang] = useState("en");
@@ -65,135 +41,85 @@ export default function GiveawayPage({ config }: { config: GiveawayConfig }) {
   const [input, setInput] = useState("");
   const [winnerCount, setWinnerCount] = useState(1);
   const [backupCount, setBackupCount] = useState(0);
-  const [keyword, setKeyword] = useState("");
-  const [minLen, setMinLen] = useState(0);
-  const [minFollowers, setMinFollowers] = useState(0);
 
-  const initialRules: Record<string, boolean> = {};
-  config.ruleDefs.forEach((r) => {
-    initialRules[r.key as string] = Boolean(r.default);
-  });
-
-  const [rules, setRules] = useState<Record<string, boolean>>(initialRules);
+  const [rules, setRules] = useState<any>({});
 
   const [loading, setLoading] = useState(false);
+
   const [winners, setWinners] = useState<User[]>([]);
   const [backups, setBackups] = useState<User[]>([]);
+
   const [total, setTotal] = useState(0);
-  const [eligible, setEligible] = useState(0);
   const [certCode, setCertCode] = useState("");
   const [resultUrl, setResultUrl] = useState("");
+
   const [error, setError] = useState("");
-  const [warn, setWarn] = useState("");
 
   function toggle(key: string) {
-    setRules((p) => ({ ...p, [key]: !p[key] }));
+    setRules((p: any) => ({
+      ...p,
+      [key]: !p[key],
+    }));
   }
 
   async function startDraw() {
+    setLoading(true);
+
     setError("");
-    setWarn("");
+
     setWinners([]);
     setBackups([]);
+
     setTotal(0);
-    setEligible(0);
+
     setCertCode("");
     setResultUrl("");
 
-    if (!input.trim()) {
-      setError(t("noUrl"));
-      return;
-    }
-
-    const anyRule = config.ruleDefs.some(
-      (r) => r.fixed || r.default || rules[r.key as string]
-    );
-
-    if (!anyRule) {
-      setError(t("noRule"));
-      return;
-    }
-
-    setLoading(true);
-
     try {
-      const reqRules: Rules = {
-        ...rules,
-        keyword,
-        minLen,
-        minFollowers,
-      };
-
-      config.ruleDefs.forEach((r) => {
-        if (r.fixed) {
-          (reqRules as any)[r.key] = true;
-        }
-      });
-
       const res = await fetch("/api/draw", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
+
         body: JSON.stringify({
           platform: config.platform,
           input,
           winnerCount,
           backupCount,
-          rules: reqRules,
+          rules,
           excluded: [],
         }),
       });
 
-      const text = await res.text();
-
-      let data: any = {};
-
-      try {
-        data = text ? JSON.parse(text) : {};
-      } catch {
-        throw new Error(text || "Sunucudan JSON olmayan cevap geldi");
-      }
-
-      console.log("DRAW RESPONSE:", data);
+      const data = await res.json();
 
       if (!res.ok || data.error) {
-        setError(data.error || `API hata verdi: ${res.status}`);
+        setError(data.error || "API Error");
         setLoading(false);
         return;
       }
 
-      if (!data.mainWinners || data.mainWinners.length === 0) {
-        setError(t("noElig"));
-        setLoading(false);
-        return;
-      }
-
-      setTotal(data.totalParticipants || 0);
-      setEligible(data.eligibleCount || 0);
       setWinners(data.mainWinners || []);
       setBackups(data.backupWinners || []);
+
+      setTotal(data.totalParticipants || 0);
+
       setCertCode(data.certCode || "");
+
       setResultUrl(data.resultUrl || data.shareUrl || "");
 
-      try {
-        localStorage.setItem(
-          "drawpicker:lastDraw",
-          JSON.stringify({
-            platform: config.platform,
-            total: data.totalParticipants || 0,
-            winners: data.mainWinners || [],
-            createdAt: new Date().toISOString(),
-          })
-        );
-      } catch {}
-
-      if (data.truncated) {
-        setWarn(t("truncated"));
-      }
+      localStorage.setItem(
+        "drawpicker:lastDraw",
+        JSON.stringify({
+          platform: config.platform,
+          total: data.totalParticipants || 0,
+          winners: data.mainWinners || [],
+          createdAt: new Date().toISOString(),
+        })
+      );
     } catch (e: any) {
-      console.error("START DRAW ERROR:", e);
-      setError(e?.message || JSON.stringify(e) || "Bilinmeyen frontend hatası");
+      setError(e?.message || "Unknown Error");
     } finally {
       setLoading(false);
     }
@@ -209,7 +135,7 @@ export default function GiveawayPage({ config }: { config: GiveawayConfig }) {
             href="/"
             className="text-zinc-400 text-sm hover:text-white transition whitespace-nowrap"
           >
-            {t("back")}
+            ← Back
           </a>
 
           <LangPicker
@@ -244,15 +170,17 @@ export default function GiveawayPage({ config }: { config: GiveawayConfig }) {
               className={`w-full bg-[#0a0a0f] border border-white/10 rounded-xl px-4 py-3 text-sm outline-none ${a.ring} transition mb-6`}
             />
 
-            <div className="font-bold mb-3 text-sm">⚡ Quick Rules</div>
+            <div className="font-bold mb-3 text-sm">
+              ⚡ Quick Rules
+            </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
-              {config.ruleDefs.map((r) => (
+              {config.ruleDefs?.map((r: any) => (
                 <Rule
-                  key={r.key as string}
-                  label={t("r_" + (r.key as string))}
-                  val={r.fixed ? true : Boolean(rules[r.key as string])}
-                  toggle={() => toggle(r.key as string)}
+                  key={r.key}
+                  label={t("r_" + r.key)}
+                  val={Boolean(rules[r.key])}
+                  toggle={() => toggle(r.key)}
                   fixed={r.fixed}
                   onClass={a.ruleOn}
                   chkClass={a.chk}
@@ -260,78 +188,37 @@ export default function GiveawayPage({ config }: { config: GiveawayConfig }) {
               ))}
             </div>
 
-            {config.showKeyword && rules["mustKeyword"] && (
-              <div className="mb-3">
-                <label className="text-xs text-zinc-400 mb-1.5 block">
-                  {t("kwLbl")}
-                </label>
-                <input
-                  type="text"
-                  placeholder={t("kwPh")}
-                  value={keyword}
-                  onChange={(e) => setKeyword(e.target.value)}
-                  className={`w-full bg-[#0a0a0f] border border-white/10 rounded-xl px-4 py-3 text-sm outline-none ${a.ring} transition`}
-                />
-              </div>
-            )}
-
-            {config.showMinLen && rules["mustMinLength"] && (
-              <div className="mb-3">
-                <label className="text-xs text-zinc-400 mb-1.5 block">
-                  {t("minLenLbl")}
-                </label>
-                <input
-                  type="number"
-                  placeholder="50"
-                  min={1}
-                  value={minLen}
-                  onChange={(e) => setMinLen(Number(e.target.value))}
-                  className={`w-32 bg-[#0a0a0f] border border-white/10 rounded-xl px-4 py-3 text-sm outline-none ${a.ring} transition`}
-                />
-              </div>
-            )}
-
-            {config.showMinFollowers && rules["mustMinFollowers"] && (
-              <div className="mb-3">
-                <label className="text-xs text-zinc-400 mb-1.5 block">
-                  {t("minFolLbl")}
-                </label>
-                <input
-                  type="number"
-                  placeholder="100"
-                  min={1}
-                  value={minFollowers}
-                  onChange={(e) => setMinFollowers(Number(e.target.value))}
-                  className={`w-40 bg-[#0a0a0f] border border-white/10 rounded-xl px-4 py-3 text-sm outline-none ${a.ring} transition`}
-                />
-              </div>
-            )}
-
-            <div className="grid grid-cols-2 gap-3 mb-6 mt-4">
+            <div className="grid grid-cols-2 gap-3 mb-6">
               <div>
                 <label className="text-xs text-zinc-400 mb-1.5 block">
-                  {t("winnerCount")}
+                  Winner Count
                 </label>
+
                 <input
                   type="number"
                   min={1}
                   max={50}
                   value={winnerCount}
-                  onChange={(e) => setWinnerCount(Number(e.target.value))}
+                  onChange={(e) =>
+                    setWinnerCount(Number(e.target.value))
+                  }
                   className={`w-full bg-[#0a0a0f] border border-white/10 rounded-xl px-4 py-3 text-sm outline-none ${a.ring} transition`}
                 />
               </div>
 
               <div>
                 <label className="text-xs text-zinc-400 mb-1.5 block">
-                  {t("backupCount")}
+                  Backup Count
                 </label>
+
                 <input
                   type="number"
                   min={0}
                   max={50}
                   value={backupCount}
-                  onChange={(e) => setBackupCount(Number(e.target.value))}
+                  onChange={(e) =>
+                    setBackupCount(Number(e.target.value))
+                  }
                   className={`w-full bg-[#0a0a0f] border border-white/10 rounded-xl px-4 py-3 text-sm outline-none ${a.ring} transition`}
                 />
               </div>
@@ -342,11 +229,14 @@ export default function GiveawayPage({ config }: { config: GiveawayConfig }) {
               disabled={loading}
               className={`w-full bg-gradient-to-r ${a.btn} hover:opacity-90 text-white py-4 rounded-xl font-black text-lg transition disabled:opacity-50 shadow-lg ${a.shadow}`}
             >
-              {loading ? `⏳ ${t("loading")}...` : `🎯 ${t("draw")}`}
+              {loading ? "⏳ Loading..." : "🎯 Start Draw"}
             </button>
 
-            {error && <p className="text-red-400 text-sm mt-3">❌ {error}</p>}
-            {warn && <p className="text-amber-400 text-sm mt-3">{warn}</p>}
+            {error && (
+              <p className="text-red-400 text-sm mt-3">
+                ❌ {error}
+              </p>
+            )}
           </div>
 
           <div>
