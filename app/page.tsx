@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from "react";
 import LangPicker from "@/components/LangPicker";
-import { tr } from "@/lib/i18n";
 import { createClient } from "@/lib/supabase-client";
+import { translations } from "@/lib/translations";
 
 type LastDraw = {
+  id?: string;
   platform: string;
   total: number;
   winners: { username: string; author?: string }[];
@@ -16,7 +17,10 @@ export default function Home() {
   const [lang, setLang] = useState("tr");
   const [lastDraw, setLastDraw] = useState<LastDraw | null>(null);
   const [user, setUser] = useState<any>(null);
-  const t = tr(lang);
+
+  const t =
+    translations[lang as keyof typeof translations] ||
+    translations.tr;
 
   useEffect(() => {
     const supabase = createClient();
@@ -52,34 +56,32 @@ export default function Home() {
 
         <div className="hidden md:flex items-center gap-8 text-sm font-bold text-zinc-300">
           <a href="/" className="text-white border-b-2 border-cyan-400 pb-2">
-            Ana Sayfa
+            {t.nav.home}
           </a>
           <a href="#ozellikler" className="hover:text-white">
-            Özellikler
+            {t.nav.features}
           </a>
           <a href="#nasil" className="hover:text-white">
-            Nasıl Çalışır?
+            {t.nav.how}
           </a>
           <a href="#fiyat" className="hover:text-white">
-            Fiyatlandırma
+            {t.nav.pricing}
           </a>
           <a href="#sss" className="hover:text-white">
-            SSS
+            {t.nav.faq}
           </a>
           <a href="#iletisim" className="hover:text-white">
-            İletişim
+            {t.nav.contact}
           </a>
         </div>
 
         <div className="relative z-[10000] flex items-center gap-3">
-          <div className="relative z-[10000]">
-            <LangPicker
-              lang={lang}
-              setLang={setLang}
-              accentHover="hover:border-sky-500"
-              accentCheck="text-sky-400"
-            />
-          </div>
+          <LangPicker
+            lang={lang}
+            setLang={setLang}
+            accentHover="hover:border-sky-500"
+            accentCheck="text-sky-400"
+          />
 
           {user ? (
             <div className="flex items-center gap-2">
@@ -90,7 +92,7 @@ export default function Home() {
                 onClick={handleLogout}
                 className="text-sm border border-white/10 hover:border-red-500 px-4 py-2 rounded-xl transition text-zinc-300 hover:text-red-400"
               >
-                Çıkış
+                {t.nav.logout}
               </button>
             </div>
           ) : (
@@ -98,7 +100,7 @@ export default function Home() {
               href="/auth/login"
               className="text-sm font-black px-5 py-2 rounded-xl border border-white/10 hover:border-cyan-400 transition"
             >
-              Giriş Yap
+              {t.nav.login}
             </a>
           )}
         </div>
@@ -107,19 +109,19 @@ export default function Home() {
       <section className="relative z-10 max-w-7xl mx-auto px-5 pt-14 pb-20 grid lg:grid-cols-2 gap-12 items-center">
         <div>
           <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-bold text-zinc-300 mb-7">
-            🛡️ %100 Adil • Şeffaf • Güvenilir
+            {t.hero.badge}
           </div>
 
           <h1 className="text-5xl sm:text-7xl font-black leading-[0.95] tracking-tight mb-7">
-            Adil Çekilişin
+            {t.hero.title1}
             <br />
             <span className="bg-gradient-to-r from-pink-400 via-purple-400 to-sky-400 bg-clip-text text-transparent">
-              Tek Adresi!
+              {t.hero.title2}
             </span>
           </h1>
 
           <p className="text-zinc-300 text-lg max-w-xl leading-relaxed mb-8">
-            X ve YouTube’da güvenilir, şeffaf ve profesyonel çekilişler düzenleyin.
+            {t.hero.desc}
           </p>
 
           <div className="flex flex-wrap gap-4 mb-6">
@@ -127,23 +129,23 @@ export default function Home() {
               href={user ? "/twitter" : "/auth/login"}
               className="bg-gradient-to-r from-pink-500 via-purple-500 to-sky-500 hover:opacity-90 text-white font-black px-7 py-4 rounded-xl transition shadow-lg shadow-sky-500/20"
             >
-              Hemen Çekiliş Yap →
+              {t.hero.start}
             </a>
 
             <a
               href="#nasil"
               className="border border-white/10 bg-white/5 hover:border-white/30 text-zinc-200 font-black px-7 py-4 rounded-xl transition"
             >
-              ▶ Nasıl Çalışır?
+              {t.hero.how}
             </a>
           </div>
 
           <div className="flex flex-wrap gap-x-5 gap-y-2 text-xs text-zinc-400 font-semibold">
-            <span>▣ Ücretsiz</span>
+            <span>▣ {t.hero.free}</span>
             <span>•</span>
-            <span>Kayıt gerekmez</span>
+            <span>{t.hero.noCard}</span>
             <span>•</span>
-            <span>200 katılımcıya kadar ücretsiz</span>
+            <span>{t.hero.limit}</span>
           </div>
         </div>
 
@@ -151,7 +153,9 @@ export default function Home() {
           <div className="absolute -inset-6 bg-gradient-to-r from-pink-500/20 to-sky-500/20 blur-3xl" />
 
           <div className="relative bg-[#141421]/90 border border-white/10 rounded-[2rem] p-6 shadow-2xl">
-            <div className="text-sm text-zinc-400 font-bold mb-4">Son Çekiliş</div>
+            <div className="text-sm text-zinc-400 font-bold mb-4">
+              {t.lastDraw.title}
+            </div>
 
             <div className="border border-white/10 bg-white/[0.03] rounded-2xl p-5 mb-5">
               <div className="flex items-center gap-4">
@@ -160,19 +164,23 @@ export default function Home() {
                 </div>
 
                 <div>
-                  <div className="text-zinc-400 text-sm">Kazanan</div>
+                  <div className="text-zinc-400 text-sm">
+                    {t.lastDraw.winner}
+                  </div>
                   <div className="text-2xl font-black">
                     @{lastDraw?.winners?.[0]?.username || "kerem.demir"}
                   </div>
-                  <div className="text-zinc-500 text-sm">Tebrikler! 🎉</div>
+                  <div className="text-zinc-500 text-sm">
+                    {t.lastDraw.congrats}
+                  </div>
                 </div>
               </div>
 
               <a
-                href="#"
+                href={lastDraw?.id ? `/result/${lastDraw.id}` : "#"}
                 className="inline-block mt-4 text-xs font-black bg-white/10 hover:bg-white/15 px-4 py-2 rounded-lg transition"
               >
-                Sonucu Görüntüle
+                {t.lastDraw.view}
               </a>
             </div>
 
@@ -182,24 +190,30 @@ export default function Home() {
                 <div className="font-black text-xl">
                   {(lastDraw?.total || 2142).toLocaleString()}
                 </div>
-                <div className="text-[11px] text-zinc-500">Toplam Yorum</div>
+                <div className="text-[11px] text-zinc-500">
+                  {t.lastDraw.comments}
+                </div>
               </div>
 
               <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-4 text-center">
                 <div className="text-2xl mb-1">👥</div>
                 <div className="font-black text-xl">1.356</div>
-                <div className="text-[11px] text-zinc-500">Uygun Katılımcı</div>
+                <div className="text-[11px] text-zinc-500">
+                  {t.lastDraw.eligible}
+                </div>
               </div>
 
               <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-4 text-center">
                 <div className="text-2xl mb-1">🏆</div>
                 <div className="font-black text-xl">1</div>
-                <div className="text-[11px] text-zinc-500">Kazanan</div>
+                <div className="text-[11px] text-zinc-500">
+                  {t.lastDraw.winners}
+                </div>
               </div>
             </div>
 
             <div className="border border-white/10 bg-white/[0.03] rounded-xl px-4 py-3 text-center text-xs font-mono text-zinc-300">
-              Çekiliş Sertifikası: {lastDraw?.cert_code || "DP-A7F3K9L2B1"}
+              {t.lastDraw.cert}: {lastDraw?.cert_code || "DP-A7F3K9L2B1"}
             </div>
           </div>
         </div>
@@ -209,20 +223,20 @@ export default function Home() {
         <div className="grid sm:grid-cols-3 gap-4">
           <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-5">
             <div className="text-2xl mb-2">⚡</div>
-            <div className="font-black mb-1">Hızlı Sonuç</div>
-            <p className="text-sm text-zinc-400">Saniyeler içinde çekiliş sonucu alın.</p>
+            <div className="font-black mb-1">{t.features.fastTitle}</div>
+            <p className="text-sm text-zinc-400">{t.features.fastText}</p>
           </div>
 
           <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-5">
             <div className="text-2xl mb-2">📜</div>
-            <div className="font-black mb-1">Sertifikalı</div>
-            <p className="text-sm text-zinc-400">Doğrulanabilir çekiliş sertifikası oluşturulur.</p>
+            <div className="font-black mb-1">{t.features.certTitle}</div>
+            <p className="text-sm text-zinc-400">{t.features.certText}</p>
           </div>
 
           <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-5">
             <div className="text-2xl mb-2">🔒</div>
-            <div className="font-black mb-1">Güvenli</div>
-            <p className="text-sm text-zinc-400">Sonuçlar kayıt altında tutulur ve paylaşılabilir.</p>
+            <div className="font-black mb-1">{t.features.secureTitle}</div>
+            <p className="text-sm text-zinc-400">{t.features.secureText}</p>
           </div>
         </div>
       </section>
