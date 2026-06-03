@@ -177,7 +177,7 @@ export async function collectTwitter(
 
   if (useComments) {
     return streamPaged(
-      `${BASE}/twitter/tweets/${tweetId}/comments`,
+      `${BASE}/twitter/search?query=conversation_id%3A${tweetId}&type=Latest`,
       apiKey,
       mapComment,
       onUsers,
