@@ -72,6 +72,20 @@ export default function ResultPage() {
     result.input_url ||
     "Çekiliş";
 
+  const shortDrawTitle = String(drawTitle)
+    .replace(/\r/g, "")
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .slice(0, 3);
+
+  const hasMoreTitle =
+    String(drawTitle)
+      .replace(/\r/g, "")
+      .split("\n")
+      .map((line) => line.trim())
+      .filter(Boolean).length > 3;
+
   const authorName =
     result.author_name ||
     result.authorName ||
@@ -159,8 +173,14 @@ export default function ResultPage() {
                 Çekiliş
               </div>
 
-              <div className="text-2xl font-black leading-snug whitespace-pre-line">
-                {drawTitle}
+              <div className="text-lg sm:text-xl font-black leading-relaxed">
+                {shortDrawTitle.map((line, i) => (
+                  <div key={i}>{line}</div>
+                ))}
+
+                {hasMoreTitle && (
+                  <div className="text-zinc-500">.....</div>
+                )}
               </div>
 
               <div className="flex flex-wrap gap-3 mt-5">
@@ -236,9 +256,7 @@ export default function ResultPage() {
                   )}
 
                   <div className="flex-1">
-                    <div className="font-black text-2xl">
-                      @{w.username}
-                    </div>
+                    <div className="font-black text-2xl">@{w.username}</div>
 
                     {w.author && (
                       <div className="text-zinc-400 text-base">
