@@ -44,6 +44,43 @@ function canUse(userPlan: string, rulePlan?: string) {
   return PLAN_LEVEL[userPlan || "free"] >= PLAN_LEVEL[rulePlan || "free"];
 }
 
+function getRuleInput(key: string) {
+  const map: Record<string, any> = {
+    mustMention: {
+      field: "mentionUsername",
+      type: "text",
+      placeholder: "@kullanici",
+    },
+    mustKeyword: {
+      field: "keyword",
+      type: "text",
+      placeholder: "örn: çekiliş",
+    },
+    mustExtraFollow: {
+      field: "extraFollowAccount",
+      type: "text",
+      placeholder: "@hesapadi",
+    },
+    mustMinFollowers: {
+      field: "minFollowers",
+      type: "number",
+      placeholder: "örn: 100",
+    },
+    mustMinLength: {
+      field: "minLength",
+      type: "number",
+      placeholder: "örn: 10",
+    },
+    mustAccountAge: {
+      field: "accountAgeDays",
+      type: "number",
+      placeholder: "örn: 30 gün",
+    },
+  };
+
+  return map[key] || null;
+}
+
 export default function GiveawayPage({ config }: any) {
   const a = ACCENT[config.accent] || ACCENT.sky;
 
@@ -68,6 +105,9 @@ export default function GiveawayPage({ config }: any) {
   const [plan, setPlan] = useState("free");
 
   useEffect(() => {
+    const saved = localStorage.getItem("drawpicker_lang");
+    if (saved) setLang(saved);
+
     const supabase = createClient();
 
     supabase.auth.getUser().then(async ({ data }) => {
@@ -95,6 +135,41 @@ export default function GiveawayPage({ config }: any) {
     }
 
     setRules((p: any) => ({ ...p, [key]: !p[key] }));
+  }
+
+  function setRuleValue(field: string, value: string) {
+    setRules((p: any) => ({ ...p, [field]: value }));
+  }
+
+  function renderRule(rule: any) {
+    const locked = !canUse(plan, rule.plan);
+    const inputDef = getRuleInput(rule.key);
+    const isActive = Boolean(rules[rule.key]);
+
+    return (
+      <div key={rule.key}>
+        <Rule
+          label={`${rule.icon || ""} ${t("r_" + rule.key)}`}
+          val={Boolean(rules[rule.key])}
+          toggle={() => toggle(rule)}
+          fixed={rule.fixed}
+          locked={locked}
+          plan={rule.plan || "free"}
+          onClass={a.ruleOn}
+          chkClass={a.chk}
+        />
+
+        {isActive && !locked && inputDef && (
+          <input
+            type={inputDef.type}
+            value={rules[inputDef.field] || ""}
+            onChange={(e) => setRuleValue(inputDef.field, e.target.value)}
+            placeholder={inputDef.placeholder}
+            className={`w-full mt-2 bg-[#0a0a0f] border border-white/10 rounded-xl px-3 py-2 text-sm outline-none ${a.ring} transition`}
+          />
+        )}
+      </div>
+    );
   }
 
   async function startDraw() {
@@ -158,8 +233,7 @@ export default function GiveawayPage({ config }: any) {
   }
 
   const quickRules = config.quickRules || config.ruleDefs?.slice(0, 4) || [];
-  const advancedRules =
-    config.advancedRules || config.ruleDefs?.slice(4) || [];
+  const advancedRules = config.advancedRules || config.ruleDefs?.slice(4) || [];
 
   return (
     <main className="min-h-screen bg-[#080812] text-white px-4 py-10 relative overflow-hidden">
@@ -179,9 +253,12 @@ export default function GiveawayPage({ config }: any) {
         <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center px-4">
           <div className="bg-[#16161f] border border-white/10 rounded-3xl p-8 max-w-md w-full text-center">
             <div className="text-5xl mb-4">🚀</div>
-            <h2 className="text-2xl font-black mb-2">Paket yükseltmeniz gerekiyor</h2>
+            <h2 className="text-2xl font-black mb-2">
+              Paket yükseltmeniz gerekiyor
+            </h2>
             <p className="text-zinc-400 text-sm mb-6">
-              Bu özellik mevcut paketinizde yok. Devam etmek için Starter, Pro veya Business paketine geçin.
+              Bu özellik mevcut paketinizde yok. Devam etmek için Starter, Pro
+              veya Business paketine geçin.
             </p>
 
             <a
@@ -266,23 +343,7 @@ export default function GiveawayPage({ config }: any) {
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
-                {quickRules.map((r: any) => {
-                  const locked = !canUse(plan, r.plan);
-
-                  return (
-                    <Rule
-                      key={r.key}
-                      label={`${r.icon || ""} ${t("r_" + r.key)}`}
-                      val={Boolean(rules[r.key])}
-                      toggle={() => toggle(r)}
-                      fixed={r.fixed}
-                      locked={locked}
-                      plan={r.plan || "free"}
-                      onClass={a.ruleOn}
-                      chkClass={a.chk}
-                    />
-                  );
-                })}
+                {quickRules.map((r: any) => renderRule(r))}
               </div>
 
               {advancedRules.length > 0 && (
@@ -300,23 +361,7 @@ export default function GiveawayPage({ config }: any) {
 
                   {showGeneralRules && (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 pt-0">
-                      {advancedRules.map((r: any) => {
-                        const locked = !canUse(plan, r.plan);
-
-                        return (
-                          <Rule
-                            key={r.key}
-                            label={`${r.icon || ""} ${t("r_" + r.key)}`}
-                            val={Boolean(rules[r.key])}
-                            toggle={() => toggle(r)}
-                            fixed={r.fixed}
-                            locked={locked}
-                            plan={r.plan || "free"}
-                            onClass={a.ruleOn}
-                            chkClass={a.chk}
-                          />
-                        );
-                      })}
+                      {advancedRules.map((r: any) => renderRule(r))}
                     </div>
                   )}
                 </div>

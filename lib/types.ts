@@ -7,6 +7,7 @@ export type User = {
   author?: string;
   name?: string;
   text?: string;
+  comment?: string;
 
   profilePicture?: string;
   avatar?: string;
@@ -16,6 +17,7 @@ export type User = {
 
   isPrivate?: boolean;
   followers?: number;
+  createdAt?: string;
 };
 
 export type Rules = {
@@ -30,6 +32,10 @@ export type Rules = {
   mustProfile?: boolean;
   mustMinFollowers?: boolean;
 
+  mustExtraFollow?: boolean;
+  mustAccountAge?: boolean;
+  advancedBotFilter?: boolean;
+
   blockHidden?: boolean;
   blockPrevious?: boolean;
 
@@ -37,8 +43,14 @@ export type Rules = {
   uniqueComments?: boolean;
 
   keyword?: string;
-  minLen?: number;
-  minFollowers?: number;
+  mentionUsername?: string;
+  extraFollowAccount?: string;
+
+  minLength?: number | string;
+  minLen?: number | string;
+
+  minFollowers?: number | string;
+  accountAgeDays?: number | string;
 };
 
 export type DrawRequest = {
