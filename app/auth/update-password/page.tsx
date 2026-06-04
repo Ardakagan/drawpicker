@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase-client";
 
 export default function UpdatePasswordPage() {
@@ -8,6 +8,14 @@ export default function UpdatePasswordPage() {
   const [done, setDone] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.onAuthStateChange((event) => {
+      if (event === "PASSWORD_RECOVERY") setReady(true);
+    });
+  }, []);
 
   async function handleUpdate() {
     setLoading(true);
@@ -32,6 +40,8 @@ export default function UpdatePasswordPage() {
             <p className="text-green-400 font-bold">Şifren güncellendi!</p>
             <a href="/auth/login" className="block mt-4 text-sky-400 hover:underline text-sm">Giriş yap →</a>
           </div>
+        ) : !ready ? (
+          <p className="text-center text-zinc-400">Yükleniyor...</p>
         ) : (
           <>
             <input
@@ -42,11 +52,8 @@ export default function UpdatePasswordPage() {
               className="w-full bg-[#16161f] border border-white/10 rounded-xl px-4 py-3 text-sm outline-none focus:border-sky-500 transition mb-4"
             />
             {error && <p className="text-red-400 text-sm mb-3">❌ {error}</p>}
-            <button
-              onClick={handleUpdate}
-              disabled={loading}
-              className="w-full bg-gradient-to-r from-sky-600 to-sky-500 py-3 rounded-xl font-bold text-sm transition disabled:opacity-50"
-            >
+            <button onClick={handleUpdate} disabled={loading}
+              className="w-full bg-gradient-to-r from-sky-600 to-sky-500 py-3 rounded-xl font-bold text-sm transition disabled:opacity-50">
               {loading ? "..." : "Şifremi Güncelle"}
             </button>
           </>
