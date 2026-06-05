@@ -135,11 +135,18 @@ export default function GiveawayPage({ config }: any) {
       if (res.status === 401 || data.error === "login_required") { window.location.href = "/auth/login"; return; }
       if (res.status === 403 || data.error === "upgrade_required") { setShowUpgrade(true); setLoading(false); return; }
       if (!res.ok || !data.success) { setError(data.error || t("apiErr")); setLoading(false); return; }
+
+      const url = data.resultUrl || data.shareUrl || "";
+      if (url) {
+        window.location.href = url;   // direkt sonuc sayfasina yonlendir
+        return;
+      }
+      // fallback: link donmezse eski inline gosterim
       setWinners(data.mainWinners || []);
       setBackups(data.backupWinners || []);
       setTotal(data.totalParticipants || 0);
       setCertCode(data.certCode || "");
-      setResultUrl(data.resultUrl || data.shareUrl || "");
+      setResultUrl(url);
     } catch (e: any) {
       setError(e?.message || t("apiErr"));
     } finally {
@@ -151,7 +158,7 @@ export default function GiveawayPage({ config }: any) {
   const advancedRules = config.advancedRules || config.ruleDefs?.slice(4) || [];
 
   return (
-    <main className="min-h-screen bg-[#080812] text-white px-4 py-10 relative overflow-hidden">
+    <main className="min-h-screen bg-[#080812] text-white px-3 sm:px-4 py-6 sm:py-10 relative overflow-hidden">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,#0ea5e933,transparent_35%),radial-gradient(circle_at_bottom_right,#a855f733,transparent_35%)]" />
 
       {loading && (
@@ -188,8 +195,8 @@ export default function GiveawayPage({ config }: any) {
         </div>
 
         <div className="text-center mb-8">
-          <div className="text-6xl mb-3">{config.icon}</div>
-          <h1 className="text-4xl sm:text-5xl font-black mb-3"><span className={a.text}>{t(config.titleKey)}</span></h1>
+          <div className="text-5xl sm:text-6xl mb-3">{config.icon}</div>
+          <h1 className="text-3xl sm:text-5xl font-black mb-3"><span className={a.text}>{t(config.titleKey)}</span></h1>
           <p className="text-zinc-400 text-sm">{t(config.subKey)}</p>
         </div>
 
