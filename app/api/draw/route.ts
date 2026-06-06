@@ -341,6 +341,7 @@ export async function POST(req: Request) {
         backups: backupWinners,
         cert_code: certCode,
         rules: rules,
+        user_id: user.id,
       });
     } catch (e) {
       console.error("SUPABASE SAVE ERROR:", e);
