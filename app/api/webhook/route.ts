@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 
 export async function POST(req: Request) {
   try {
-    const secret = process.env.WEBHOOK_SECRET;
+    const secret = process.env.DODO_WEBHOOK_SECRET;
     const incomingSecret = req.headers.get("x-webhook-secret");
 
     if (!secret) {
