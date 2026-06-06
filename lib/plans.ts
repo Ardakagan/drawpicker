@@ -1,14 +1,23 @@
 // =============================================
-// BURADAN FİYAT VE LİMİTLERİ DEĞİŞTİREBİLİRSİN
+// BURADAN FİYAT, LİMİT VE DODO ÜRÜN ID'LERİNİ DEĞİŞTİREBİLİRSİN
+//
+// Her plan için 4 Dodo ürün ID'si var:
+//   dodoSubMonthlyId / dodoSubYearlyId   -> ABONELİK (otomatik yenilenen)
+//   dodoOnceMonthlyId / dodoOnceYearlyId -> TEK SEFERLİK (kripto destekli, yenilenmez)
+// Tek seferlik ID'leri Dodo'da "One-Time" tipinde açıp buraya yapıştır.
 // =============================================
 
 export const PLANS = {
   free: {
     name: "Free",
     drawsPerMonth: 1,
-    maxParticipants: 200, // aylık işlenen katılımcı limiti
+    maxParticipants: 200,
     monthlyPrice: 0,
     yearlyPrice: 0,
+    dodoSubMonthlyId: "",
+    dodoSubYearlyId: "",
+    dodoOnceMonthlyId: "",
+    dodoOnceYearlyId: "",
     dodoMonthlyId: "",
     dodoYearlyId: "",
     features: [
@@ -24,11 +33,17 @@ export const PLANS = {
   starter: {
     name: "Starter",
     drawsPerMonth: 999999,
-    maxParticipants: 5000, // aylık işlenen katılımcı limiti
+    maxParticipants: 5000,
     monthlyPrice: 8.99,
     yearlyPrice: 89,
+    // ABONELİK (mevcut)
+    dodoSubMonthlyId: "pdt_0NgG5U0kp4o6A0gY11X6H",
+    dodoSubYearlyId: "pdt_0NgG7MLWkcZetxB1Iabvg",
     dodoMonthlyId: "pdt_0NgG5U0kp4o6A0gY11X6H",
     dodoYearlyId: "pdt_0NgG7MLWkcZetxB1Iabvg",
+    // TEK SEFERLİK (One-Time)
+    dodoOnceMonthlyId: "pdt_0NgUSz67S5m6fdiEQb2tN",
+    dodoOnceYearlyId: "pdt_0NgUT5mSUYAQvxB9TzVSH",
     features: [
       "Sınırsız çekiliş",
       "5.000 aylık katılımcı işleme limiti",
@@ -55,11 +70,15 @@ export const PLANS = {
   pro: {
     name: "Pro",
     drawsPerMonth: 999999,
-    maxParticipants: 40000, // aylık işlenen katılımcı limiti
+    maxParticipants: 40000,
     monthlyPrice: 17.99,
     yearlyPrice: 179,
+    dodoSubMonthlyId: "pdt_0NgG7hDSAhJlPT8wqC8Be",
+    dodoSubYearlyId: "pdt_0NgG8CoAcTJo4YvlBa3Jw",
     dodoMonthlyId: "pdt_0NgG7hDSAhJlPT8wqC8Be",
     dodoYearlyId: "pdt_0NgG8CoAcTJo4YvlBa3Jw",
+    dodoOnceMonthlyId: "pdt_0NgUThftpqarrV7lNW8Gj",
+    dodoOnceYearlyId: "pdt_0NgUTwVxAsdBFtFcevbV2",
     features: [
       "Sınırsız çekiliş",
       "40.000 aylık katılımcı işleme limiti",
@@ -93,11 +112,15 @@ export const PLANS = {
   business: {
     name: "Business",
     drawsPerMonth: 999999,
-    maxParticipants: 300000, // aylık işlenen katılımcı limiti
+    maxParticipants: 300000,
     monthlyPrice: 27.99,
     yearlyPrice: 279,
+    dodoSubMonthlyId: "pdt_0NgG8R5pz4qs9SgFBZN1s",
+    dodoSubYearlyId: "pdt_0NgG8vSR1omLndnKZ7pF2",
     dodoMonthlyId: "pdt_0NgG8R5pz4qs9SgFBZN1s",
     dodoYearlyId: "pdt_0NgG8vSR1omLndnKZ7pF2",
+    dodoOnceMonthlyId: "pdt_0NgUUBJO4rIBqizFbhuFD",
+    dodoOnceYearlyId: "pdt_0NgUUJIJnH0SAaUUEAajL",
     features: [
       "Sınırsız çekiliş",
       "300.000 aylık katılımcı işleme limiti",
@@ -135,6 +158,19 @@ export type PlanKey = keyof typeof PLANS;
 
 export function getPlan(key: string) {
   return PLANS[key as PlanKey] || PLANS.free;
+}
+
+// mode: "subscription" | "one_time", interval: "monthly" | "yearly"
+export function getDodoProductId(
+  planKey: string,
+  mode: "subscription" | "one_time",
+  interval: "monthly" | "yearly"
+): string {
+  const p = getPlan(planKey) as any;
+  if (mode === "one_time") {
+    return interval === "yearly" ? p.dodoOnceYearlyId : p.dodoOnceMonthlyId;
+  }
+  return interval === "yearly" ? p.dodoSubYearlyId : p.dodoSubMonthlyId;
 }
 
 export function canDraw(

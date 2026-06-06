@@ -1,14 +1,14 @@
 import { NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
-import { PLANS, type PlanKey } from "@/lib/plans";
+import { PLANS, type PlanKey, getDodoProductId } from "@/lib/plans";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function POST(req: Request) {
   try {
-    const { plan, interval } = await req.json();
+    const { plan, interval = "monthly", mode = "subscription" } = await req.json();
 
     const cookieStore = cookies();
     const supabase = createServerClient(
@@ -32,9 +32,22 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Geçersiz plan" }, { status: 400 });
     }
 
-    const productId = interval === "yearly" ? planData.dodoYearlyId : planData.dodoMonthlyId;
+    const billingMode: "subscription" | "one_time" =
+      mode === "one_time" ? "one_time" : "subscription";
+    const billingInterval: "monthly" | "yearly" =
+      interval === "yearly" ? "yearly" : "monthly";
+
+    const productId = getDodoProductId(plan, billingMode, billingInterval);
     if (!productId) {
-      return NextResponse.json({ error: "Dodo Product ID eksik" }, { status: 500 });
+      return NextResponse.json(
+        {
+          error:
+            billingMode === "one_time"
+              ? "Bu plan için tek seferlik ürün henüz tanımlı değil."
+              : "Dodo Product ID eksik",
+        },
+        { status: 500 }
+      );
     }
 
     const apiKey = process.env.DODO_API_KEY;
@@ -42,43 +55,60 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "DODO_API_KEY eksik" }, { status: 500 });
     }
 
-    const dodoRes = await fetch("https://live.dodopayments.com/checkouts", {
+    // Abonelik -> /subscriptions, Tek seferlik -> /checkouts
+    const endpoint =
+      billingMode === "subscription"
+        ? "https://live.dodopayments.com/subscriptions"
+        : "https://live.dodopayments.com/checkouts";
+
+    const payload: any = {
+      customer: {
+        email: user.email,
+        name: user.email?.split("@")[0] || "Customer",
+        create_new_customer: false,
+      },
+      return_url: "https://drawpicker.io/dashboard?payment=success",
+      metadata: {
+        user_id: user.id,
+        plan: plan,
+        interval: billingInterval,
+        mode: billingMode,
+      },
+    };
+
+    if (billingMode === "subscription") {
+      payload.product_id = productId;
+      payload.quantity = 1;
+    } else {
+      payload.product_cart = [{ product_id: productId, quantity: 1 }];
+    }
+
+    const dodoRes = await fetch(endpoint, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${apiKey}`,
+        Authorization: `Bearer ${apiKey}`,
       },
-      body: JSON.stringify({
-        product_cart: [
-          {
-            product_id: productId,
-            quantity: 1,
-          },
-        ],
-        customer: {
-          email: user.email,
-          name: user.email?.split("@")[0] || "Customer",
-          create_new_customer: false,
-        },
-        return_url: "https://drawpicker.io/dashboard?payment=success",
-        metadata: {
-          user_id: user.id,
-          plan: plan,
-          interval: interval,
-        },
-      }),
+      body: JSON.stringify(payload),
     });
 
     const dodoData = await dodoRes.json();
 
     if (!dodoRes.ok) {
       console.error("DODO ERROR:", dodoData);
-      return NextResponse.json({ error: "Ödeme sistemi hatası: " + JSON.stringify(dodoData) }, { status: 500 });
+      return NextResponse.json(
+        { error: "Ödeme sistemi hatası: " + JSON.stringify(dodoData) },
+        { status: 500 }
+      );
     }
 
     return NextResponse.json({
       success: true,
-      checkoutUrl: dodoData.checkout_url || dodoData.payment_link || dodoData.url,
+      checkoutUrl:
+        dodoData.checkout_url ||
+        dodoData.payment_link ||
+        dodoData.url ||
+        dodoData.checkout?.url,
     });
   } catch (err: any) {
     console.error("CHECKOUT ERROR:", err);

@@ -127,7 +127,25 @@ export async function POST(req: Request) {
       dbUser.participants_used_this_month = 0;
     }
 
-    const userPlanKey = normalizePlan(dbUser.plan);
+    let userPlanKey = normalizePlan(dbUser.plan);
+
+    // Tek seferlik plan suresi gectiyse free'ye dusur
+    if (
+      dbUser.plan_type === "one_time" &&
+      dbUser.current_period_end &&
+      new Date(dbUser.current_period_end) < new Date() &&
+      userPlanKey !== "free"
+    ) {
+      userPlanKey = "free";
+      try {
+        await admin
+          .from("users")
+          .update({ plan: "free", subscription_status: "expired" })
+          .eq("id", user.id);
+        dbUser.plan = "free";
+      } catch {}
+    }
+
     const plan = getPlan(userPlanKey);
 
     if (dbUser.draws_this_month >= plan.drawsPerMonth) {
