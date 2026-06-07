@@ -299,7 +299,7 @@ export default function Home() {
           <a href="/" className="text-white border-b-2 border-cyan-400 pb-2">{t.nav.home}</a>
           <a href="#features" className="hover:text-white">{t.nav.features}</a>
           <a href="#nasil" className="hover:text-white">{t.nav.how}</a>
-          <a href="#pricing" className="hover:text-white text-pink-400">{t.nav.pricing}</a>
+          <a href="/pricing" className="hover:text-white text-pink-400">{t.nav.pricing}</a>
           <a href="#iletisim" className="hover:text-white">{t.nav.contact}</a>
         </div>
         <div className="relative z-[10000] flex items-center gap-3">

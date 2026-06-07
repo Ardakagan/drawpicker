@@ -7,7 +7,7 @@ import LangPicker from "@/components/LangPicker";
 
 const PT: Record<string, any> = {
   tr: {
-    back: "← Ana Sayfa", title: "Fiyatlandırma", sub: "İhtiyacına göre plan ve ödeme şekli seç.",
+    back: "← Ana Sayfa", title: "Fiyatlar", sub: "İhtiyacına göre plan ve ödeme şekli seç.",
     monthly: "Aylık", yearly: "Yıllık", discount: "%50'ye varan tasarruf", freeDesc: "Tek seferlik deneme",
     current: "Mevcut Plan", default: "Varsayılan", popular: "EN POPÜLER", perMonth: "ay", perYear: "yıl",
     yearlySave: "tasarruf", loading: "Yükleniyor...",
@@ -22,7 +22,7 @@ const PT: Record<string, any> = {
     },
   },
   en: {
-    back: "← Home", title: "Pricing", sub: "Choose the plan and payment type that fits you.",
+    back: "← Home", title: "Prices", sub: "Choose the plan and payment type that fits you.",
     monthly: "Monthly", yearly: "Yearly", discount: "Save up to 50%", freeDesc: "One-time trial",
     current: "Current Plan", default: "Default", popular: "MOST POPULAR", perMonth: "month", perYear: "year",
     yearlySave: "saved", loading: "Loading...",
@@ -67,7 +67,7 @@ const PT: Record<string, any> = {
     },
   },
   fr: {
-    back: "← Accueil", title: "Tarifs", sub: "Choisissez le forfait et le mode de paiement adaptés.",
+    back: "← Accueil", title: "Prix", sub: "Choisissez le forfait et le mode de paiement adaptés.",
     monthly: "Mensuel", yearly: "Annuel", discount: "Économisez jusqu’à 50%", freeDesc: "Essai unique",
     current: "Plan actuel", default: "Par défaut", popular: "LE PLUS POPULAIRE", perMonth: "mois", perYear: "an",
     yearlySave: "économisé", loading: "Chargement...",
@@ -127,7 +127,7 @@ const PT: Record<string, any> = {
     },
   },
   ko: {
-    back: "← 홈", title: "요금제", sub: "필요에 맞는 플랜과 결제 방식을 선택하세요.",
+    back: "← 홈", title: "가격", sub: "필요에 맞는 플랜과 결제 방식을 선택하세요.",
     monthly: "월간", yearly: "연간", discount: "최대 50% 절약", freeDesc: "1회 체험",
     current: "현재 플랜", default: "기본", popular: "가장 인기", perMonth: "월", perYear: "년",
     yearlySave: "절약", loading: "로딩 중...",
@@ -157,7 +157,7 @@ const PT: Record<string, any> = {
     },
   },
   pl: {
-    back: "← Strona główna", title: "Cennik", sub: "Wybierz plan i sposób płatności.",
+    back: "← Strona główna", title: "Ceny", sub: "Wybierz plan i sposób płatności.",
     monthly: "Miesięcznie", yearly: "Rocznie", discount: "Oszczędź do 50%", freeDesc: "Jednorazowy test",
     current: "Aktualny plan", default: "Domyślny", popular: "NAJPOPULARNIEJSZY", perMonth: "mies.", perYear: "rok",
     yearlySave: "oszczędzasz", loading: "Ładowanie...",
