@@ -341,6 +341,19 @@ export async function POST(req: Request) {
       }
 
       twitterStats = await getTwitterTweetStats(input, apiKey);
+
+      // Çekiliş sahibini aday listesinden çıkar
+      const ownerUsername = String(
+        twitterStats?.authorUsername ||
+        twitterStats?.username ||
+        twitterStats?.author ||
+        ""
+      ).replace("@", "").toLowerCase().trim();
+
+      if (ownerUsername) {
+        excludedList.push(ownerUsername);
+      }
+
       truncated = await collectTwitter(input, rules, apiKey, onUsers, deadline);
     }
 
