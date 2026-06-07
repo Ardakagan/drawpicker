@@ -261,6 +261,7 @@ export default function Home() {
   const [pricingInterval, setPricingInterval] = useState<PricingInterval>("monthly");
   const [openFeature, setOpenFeature] = useState<number | null>(null);
   const [openStep, setOpenStep] = useState<number | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const t = translations[lang as keyof typeof translations] || translations.tr;
   const h = HOME_TEXT[lang] || HOME_TEXT.en;
@@ -319,8 +320,25 @@ export default function Home() {
           ) : (
             <a href="/auth/login" className="text-xs sm:text-sm font-black px-4 sm:px-5 py-2 rounded-xl border border-white/10 hover:border-cyan-400 transition whitespace-nowrap">{t.nav.login}</a>
           )}
+          <button onClick={() => setMenuOpen(!menuOpen)} aria-label="Menu" className="md:hidden flex items-center justify-center w-10 h-10 rounded-xl border border-white/10 text-zinc-200 hover:border-sky-500 transition">
+            <span className="text-lg leading-none">{menuOpen ? "✕" : "☰"}</span>
+          </button>
         </div>
       </nav>
+
+      {/* MOBIL MENU */}
+      {menuOpen && (
+        <div className="md:hidden relative z-[9998] max-w-7xl mx-auto px-4 pb-2">
+          <div className="bg-[#141421] border border-white/10 rounded-2xl p-3 flex flex-col text-sm font-bold text-zinc-200">
+            <a href="/" onClick={() => setMenuOpen(false)} className="px-4 py-3 rounded-xl hover:bg-white/5 transition">{t.nav.home}</a>
+            <a href="#features" onClick={() => setMenuOpen(false)} className="px-4 py-3 rounded-xl hover:bg-white/5 transition">{t.nav.features}</a>
+            <a href="#nasil" onClick={() => setMenuOpen(false)} className="px-4 py-3 rounded-xl hover:bg-white/5 transition">{t.nav.how}</a>
+            <a href="/pricing" onClick={() => setMenuOpen(false)} className="px-4 py-3 rounded-xl hover:bg-white/5 transition text-pink-400">{t.nav.pricing}</a>
+            <a href="#iletisim" onClick={() => setMenuOpen(false)} className="px-4 py-3 rounded-xl hover:bg-white/5 transition">{t.nav.contact}</a>
+            {user && <a href="/dashboard" onClick={() => setMenuOpen(false)} className="px-4 py-3 rounded-xl hover:bg-white/5 transition">{h.account}</a>}
+          </div>
+        </div>
+      )}
 
       {/* HERO */}
       <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-5 pt-10 sm:pt-14 pb-10 sm:pb-14 text-center">
@@ -337,7 +355,7 @@ export default function Home() {
         <div className="grid lg:grid-cols-[1fr_380px] gap-5 sm:gap-6">
           <div className="grid md:grid-cols-2 gap-5 sm:gap-6">
             <div className="relative overflow-hidden bg-[#141421]/90 border border-red-500/30 rounded-3xl p-5 sm:p-7 shadow-2xl">
-              <div className="absolute right-6 sm:right-8 top-14 sm:top-16 text-[7rem] sm:text-[9rem] text-white/[0.04] pointer-events-none select-none">▶️</div>
+              <div className="hidden sm:block absolute right-8 top-16 text-[9rem] text-white/[0.04] pointer-events-none select-none">▶️</div>
               <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-red-500 to-pink-500 flex items-center justify-center text-2xl sm:text-3xl mb-4 sm:mb-5">▶️</div>
               <h2 className="text-2xl sm:text-3xl font-black mb-3">{h.youtubeTitle}</h2>
               <p className="text-zinc-400 text-sm mb-5 sm:mb-6">{h.youtubeSub}</p>
@@ -351,7 +369,7 @@ export default function Home() {
             </div>
 
             <div className="relative overflow-hidden bg-[#141421]/90 border border-sky-500/30 rounded-3xl p-5 sm:p-7 shadow-2xl">
-              <div className="absolute right-6 sm:right-8 top-8 sm:top-10 text-[8rem] sm:text-[10rem] text-white/[0.04] pointer-events-none select-none">𝕏</div>
+              <div className="hidden sm:block absolute right-8 top-10 text-[10rem] text-white/[0.04] pointer-events-none select-none">𝕏</div>
               <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-black border border-white/10 flex items-center justify-center text-2xl sm:text-3xl mb-4 sm:mb-5">𝕏</div>
               <h2 className="text-2xl sm:text-3xl font-black mb-3">{h.twitterTitle}</h2>
               <p className="text-zinc-400 text-sm mb-5 sm:mb-6">{h.twitterSub}</p>
