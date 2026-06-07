@@ -161,7 +161,6 @@ export default function ResultPage() {
         await navigator.share({ 
           title: rt.xShareTitle,
           text: shareText,
-          url: verificationUrl 
         });
         return;
       } catch {}
