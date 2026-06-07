@@ -8,6 +8,7 @@ import LangPicker from "@/components/LangPicker";
 type Winner = {
   username?: string;
   author?: string;
+  name?: string;
   profilePicture?: string;
 };
 
@@ -126,19 +127,34 @@ export default function ResultPage() {
     return () => cancelAnimationFrame(animId);
   }, [result]);
 
-  async function handleShare() {
-    const url = window.location.href;
-    if (navigator.share) {
-      try {
-        await navigator.share({ title: `DrawPicker — ${rt.title}`, url });
-        return;
-      } catch {}
-    }
+  async function handleCopyVerificationLink() {
+    const verificationUrl = window.location.href;
     try {
-      await navigator.clipboard.writeText(url);
+      await navigator.clipboard.writeText(verificationUrl);
       setCopied(true);
       setTimeout(() => setCopied(false), 2500);
     } catch {}
+  }
+
+  function handleShareOnX() {
+    const verificationUrl = window.location.href;
+    const winnerLines = winners.map((w) => {
+      const username = w.username ? `@${w.username}` : (w.author || w.name || "unknown");
+      return username;
+    });
+
+    const text = [
+      "🏆 Giveaway Results",
+      "",
+      "Winners:",
+      ...winnerLines,
+      "",
+      "🔗 Verification:",
+      verificationUrl,
+    ].join("\n");
+
+    const shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
+    window.open(shareUrl, "_blank", "noopener,noreferrer");
   }
 
   // Mevcut cekilisi ayni gonderi + ayni kurallarla yeniden cek
@@ -353,9 +369,15 @@ export default function ResultPage() {
             </div>
 
             {/* Butonlar — hepsi ayni boyut */}
-            <button onClick={handleShare} className={`${btnBase} bg-gradient-to-r from-sky-600 to-sky-500 hover:opacity-90 text-white shadow-lg shadow-sky-500/20`}>
-              {copied ? `✅ ${rt.copied}` : `🔗 ${rt.share}`}
-            </button>
+            <div className="grid gap-3">
+              <button onClick={handleCopyVerificationLink} className={`${btnBase} bg-gradient-to-r from-sky-600 to-sky-500 hover:opacity-90 text-white shadow-lg shadow-sky-500/20`}>
+                {copied ? `✅ ${rt.copied}` : "🔗 Copy Verification Link"}
+              </button>
+
+              <button onClick={handleShareOnX} className={`${btnBase} bg-[#1d9bf0] hover:bg-[#16a1ff] text-white shadow-lg shadow-sky-500/20`}>
+                Share on X
+              </button>
+            </div>
 
             <button onClick={handleRedraw} disabled={redrawing} className={`${btnBase} bg-white/10 hover:bg-white/15 border border-white/15 text-white disabled:opacity-50`}>
               {redrawing ? `⏳ ${rt.redrawing}` : rt.redrawCancel}
