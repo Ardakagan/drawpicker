@@ -270,7 +270,7 @@ export default function Home() {
     if (saved) setLang(saved);
     const supabase = createClient();
     supabase.auth.getUser().then(({ data }) => setUser(data.user));
-    fetch("/api/latest-result").then((r) => r.json()).then((data) => { if (data.result) setLastDraw(data.result); }).catch(() => {});
+    supabase.from("draw_results").select("*").order("created_at", { ascending: false }).limit(1).single().then(({ data }) => { if (data) setLastDraw(data); });
   }, []);
 
   async function handleLogout() {
@@ -295,13 +295,13 @@ export default function Home() {
   ];
 
   return (
-    <main className="min-h-screen bg-[#080812] text-white overflow-hidden relative">
+    <main className="min-h-screen bg-[#080812] text-white overflow-x-hidden relative">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,#0ea5e933,transparent_32%),radial-gradient(circle_at_85%_45%,#a855f733,transparent_35%),linear-gradient(180deg,#080812,#0b0b14)]" />
       <div className="absolute inset-0 opacity-[0.06] bg-[linear-gradient(to_right,#fff_1px,transparent_1px),linear-gradient(to_bottom,#fff_1px,transparent_1px)] bg-[size:48px_48px]" />
 
       {/* NAVBAR */}
-      <nav className="relative z-[9999] max-w-7xl mx-auto flex items-center justify-between px-5 py-5 border-b border-white/10">
-        <a href="/" className="text-2xl font-black tracking-tight">🎁 Draw<span className="text-pink-400">Picker</span></a>
+      <nav className="relative z-[9999] max-w-7xl mx-auto flex items-center justify-between gap-2 px-4 sm:px-5 py-4 sm:py-5 border-b border-white/10">
+        <a href="/" className="text-xl sm:text-2xl font-black tracking-tight shrink-0">🎁 Draw<span className="text-pink-400">Picker</span></a>
         <div className="hidden md:flex items-center gap-8 text-sm font-bold text-zinc-300">
           <a href="/" className="text-white border-b-2 border-cyan-400 pb-2">{t.nav.home}</a>
           <a href="#features" className="hover:text-white">{t.nav.features}</a>
@@ -309,97 +309,97 @@ export default function Home() {
           <a href="/pricing" className="hover:text-white text-pink-400">{t.nav.pricing}</a>
           <a href="#iletisim" className="hover:text-white">{t.nav.contact}</a>
         </div>
-        <div className="relative z-[10000] flex items-center gap-3">
+        <div className="relative z-[10000] flex items-center gap-2 sm:gap-3 shrink-0">
           <LangPicker lang={lang} setLang={setLang} accentHover="hover:border-sky-500" accentCheck="text-sky-400" />
           {user ? (
             <div className="flex items-center gap-2">
               <a href="/dashboard" className="text-sm border border-white/10 hover:border-sky-500 px-4 py-2 rounded-xl transition text-zinc-300 hover:text-white hidden sm:block">{h.account}</a>
-              <button onClick={handleLogout} className="text-sm border border-white/10 hover:border-red-500 px-4 py-2 rounded-xl transition text-zinc-300 hover:text-red-400">{t.nav.logout}</button>
+              <button onClick={handleLogout} className="text-xs sm:text-sm border border-white/10 hover:border-red-500 px-3 sm:px-4 py-2 rounded-xl transition text-zinc-300 hover:text-red-400">{t.nav.logout}</button>
             </div>
           ) : (
-            <a href="/auth/login" className="text-sm font-black px-5 py-2 rounded-xl border border-white/10 hover:border-cyan-400 transition">{t.nav.login}</a>
+            <a href="/auth/login" className="text-xs sm:text-sm font-black px-4 sm:px-5 py-2 rounded-xl border border-white/10 hover:border-cyan-400 transition whitespace-nowrap">{t.nav.login}</a>
           )}
         </div>
       </nav>
 
       {/* HERO */}
-      <section className="relative z-10 max-w-7xl mx-auto px-5 pt-14 pb-14 text-center">
-        <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-bold text-zinc-300 mb-7">{t.hero.badge}</div>
-        <h1 className="text-5xl sm:text-7xl font-black leading-[0.95] tracking-tight mb-7">
+      <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-5 pt-10 sm:pt-14 pb-10 sm:pb-14 text-center">
+        <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-bold text-zinc-300 mb-6 sm:mb-7">{t.hero.badge}</div>
+        <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black leading-[1.05] sm:leading-[0.95] tracking-tight mb-6 sm:mb-7">
           {t.hero.title1}<br />
           <span className="bg-gradient-to-r from-pink-400 via-purple-400 to-sky-400 bg-clip-text text-transparent">{t.hero.title2}</span>
         </h1>
-        <p className="text-zinc-300 text-lg max-w-2xl mx-auto leading-relaxed mb-10">{t.hero.desc}</p>
+        <p className="text-zinc-300 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed mb-8 sm:mb-10">{t.hero.desc}</p>
       </section>
 
       {/* PLATFORM CARDS */}
-      <section id="platforms" className="relative z-10 max-w-7xl mx-auto px-5 pb-14">
-        <div className="grid lg:grid-cols-[1fr_380px] gap-6">
-          <div className="grid md:grid-cols-2 gap-6">
-            <div className="relative overflow-hidden bg-[#141421]/90 border border-red-500/30 rounded-3xl p-7 shadow-2xl">
-              <div className="absolute right-8 top-16 text-[9rem] text-white/[0.04]">▶️</div>
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-red-500 to-pink-500 flex items-center justify-center text-3xl mb-5">▶️</div>
-              <h2 className="text-3xl font-black mb-3">{h.youtubeTitle}</h2>
-              <p className="text-zinc-400 text-sm mb-6">{h.youtubeSub}</p>
-              <div className="space-y-3 text-sm text-zinc-300 mb-7">
+      <section id="platforms" className="relative z-10 max-w-7xl mx-auto px-4 sm:px-5 pb-12 sm:pb-14">
+        <div className="grid lg:grid-cols-[1fr_380px] gap-5 sm:gap-6">
+          <div className="grid md:grid-cols-2 gap-5 sm:gap-6">
+            <div className="relative overflow-hidden bg-[#141421]/90 border border-red-500/30 rounded-3xl p-5 sm:p-7 shadow-2xl">
+              <div className="absolute right-6 sm:right-8 top-14 sm:top-16 text-[7rem] sm:text-[9rem] text-white/[0.04] pointer-events-none select-none">▶️</div>
+              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-red-500 to-pink-500 flex items-center justify-center text-2xl sm:text-3xl mb-4 sm:mb-5">▶️</div>
+              <h2 className="text-2xl sm:text-3xl font-black mb-3">{h.youtubeTitle}</h2>
+              <p className="text-zinc-400 text-sm mb-5 sm:mb-6">{h.youtubeSub}</p>
+              <div className="space-y-2.5 sm:space-y-3 text-sm text-zinc-300 mb-6 sm:mb-7">
                 <div>✓ {h.commentFiltering}</div>
                 <div>✓ {h.multipleWinners}</div>
                 <div>✓ {h.backupWinners}</div>
                 <div>✓ {h.certificate}</div>
               </div>
-              <a href="/youtube" className="block w-full text-center bg-gradient-to-r from-red-500 to-pink-500 hover:opacity-90 py-4 rounded-xl font-black transition">{h.startYoutube}</a>
+              <a href="/youtube" className="block w-full text-center bg-gradient-to-r from-red-500 to-pink-500 hover:opacity-90 py-3.5 sm:py-4 rounded-xl font-black transition">{h.startYoutube}</a>
             </div>
 
-            <div className="relative overflow-hidden bg-[#141421]/90 border border-sky-500/30 rounded-3xl p-7 shadow-2xl">
-              <div className="absolute right-8 top-10 text-[10rem] text-white/[0.04]">𝕏</div>
-              <div className="w-14 h-14 rounded-2xl bg-black border border-white/10 flex items-center justify-center text-3xl mb-5">𝕏</div>
-              <h2 className="text-3xl font-black mb-3">{h.twitterTitle}</h2>
-              <p className="text-zinc-400 text-sm mb-6">{h.twitterSub}</p>
-              <div className="space-y-3 text-sm text-zinc-300 mb-7">
+            <div className="relative overflow-hidden bg-[#141421]/90 border border-sky-500/30 rounded-3xl p-5 sm:p-7 shadow-2xl">
+              <div className="absolute right-6 sm:right-8 top-8 sm:top-10 text-[8rem] sm:text-[10rem] text-white/[0.04] pointer-events-none select-none">𝕏</div>
+              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-black border border-white/10 flex items-center justify-center text-2xl sm:text-3xl mb-4 sm:mb-5">𝕏</div>
+              <h2 className="text-2xl sm:text-3xl font-black mb-3">{h.twitterTitle}</h2>
+              <p className="text-zinc-400 text-sm mb-5 sm:mb-6">{h.twitterSub}</p>
+              <div className="space-y-2.5 sm:space-y-3 text-sm text-zinc-300 mb-6 sm:mb-7">
                 <div>✓ {h.commentFiltering}</div>
                 <div>✓ {h.multipleWinners}</div>
                 <div>✓ {h.backupWinners}</div>
                 <div>✓ {h.certificate}</div>
               </div>
-              <a href="/twitter" className="block w-full text-center bg-gradient-to-r from-cyan-400 to-blue-600 hover:opacity-90 py-4 rounded-xl font-black transition">{h.startTwitter}</a>
+              <a href="/twitter" className="block w-full text-center bg-gradient-to-r from-cyan-400 to-blue-600 hover:opacity-90 py-3.5 sm:py-4 rounded-xl font-black transition">{h.startTwitter}</a>
             </div>
           </div>
 
-          <div className="bg-[#141421]/90 border border-white/10 rounded-3xl p-6 shadow-2xl">
+          <div className="bg-[#141421]/90 border border-white/10 rounded-3xl p-5 sm:p-6 shadow-2xl">
             <div className="text-sm text-zinc-400 font-bold mb-4">🏆 {t.lastDraw.title}</div>
-            <div className="border border-white/10 bg-white/[0.03] rounded-2xl p-5 mb-5">
+            <div className="border border-white/10 bg-white/[0.03] rounded-2xl p-4 sm:p-5 mb-5">
               <div className="flex items-center gap-4">
                 {lastWinner?.avatar || lastWinner?.image || lastWinner?.profilePicture ? (
-                  <img src={lastWinner.avatar || lastWinner.image || lastWinner.profilePicture} alt="" className="w-16 h-16 rounded-full object-cover" />
+                  <img src={lastWinner.avatar || lastWinner.image || lastWinner.profilePicture} alt="" className="w-14 h-14 sm:w-16 sm:h-16 rounded-full object-cover shrink-0" />
                 ) : (
-                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-pink-400 to-sky-400 flex items-center justify-center text-3xl">🏆</div>
+                  <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-pink-400 to-sky-400 flex items-center justify-center text-2xl sm:text-3xl shrink-0">🏆</div>
                 )}
-                <div>
+                <div className="min-w-0">
                   <div className="text-zinc-400 text-sm">{t.lastDraw.winner}</div>
-                  <div className="text-2xl font-black">@{lastWinner?.username || lastWinner?.author || (lastWinner as any)?.name || (lastWinner as any)?.id || "drawpicker"}</div>
+                  <div className="text-xl sm:text-2xl font-black truncate">@{lastWinner?.username || "drawpicker"}</div>
                   <div className="text-zinc-500 text-sm">{t.lastDraw.congrats}</div>
                 </div>
               </div>
               <a href={lastDraw?.id ? `/result/${lastDraw.id}` : "#"} className="inline-block mt-4 text-xs font-black bg-white/10 hover:bg-white/15 px-4 py-2 rounded-lg transition">{t.lastDraw.view}</a>
             </div>
-            <div className="grid grid-cols-3 gap-3 mb-5">
-              <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-4 text-center">
-                <div className="text-2xl mb-1">💬</div>
-                <div className="font-black text-xl">{(lastDraw?.total || 0).toLocaleString()}</div>
-                <div className="text-[11px] text-zinc-500">{t.lastDraw.comments}</div>
+            <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-5">
+              <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-3 sm:p-4 text-center">
+                <div className="text-xl sm:text-2xl mb-1">💬</div>
+                <div className="font-black text-lg sm:text-xl">{(lastDraw?.total || 0).toLocaleString()}</div>
+                <div className="text-[10px] sm:text-[11px] text-zinc-500">{t.lastDraw.comments}</div>
               </div>
-              <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-4 text-center">
-                <div className="text-2xl mb-1">👥</div>
-                <div className="font-black text-xl">{lastDraw?.winners?.length || 0}</div>
-                <div className="text-[11px] text-zinc-500">{t.lastDraw.eligible}</div>
+              <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-3 sm:p-4 text-center">
+                <div className="text-xl sm:text-2xl mb-1">👥</div>
+                <div className="font-black text-lg sm:text-xl">{lastDraw?.winners?.length || 0}</div>
+                <div className="text-[10px] sm:text-[11px] text-zinc-500">{t.lastDraw.eligible}</div>
               </div>
-              <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-4 text-center">
-                <div className="text-2xl mb-1">🏆</div>
-                <div className="font-black text-xl">1</div>
-                <div className="text-[11px] text-zinc-500">{t.lastDraw.winners}</div>
+              <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-3 sm:p-4 text-center">
+                <div className="text-xl sm:text-2xl mb-1">🏆</div>
+                <div className="font-black text-lg sm:text-xl">1</div>
+                <div className="text-[10px] sm:text-[11px] text-zinc-500">{t.lastDraw.winners}</div>
               </div>
             </div>
-            <div className="border border-white/10 bg-white/[0.03] rounded-xl px-4 py-3 text-center text-xs font-mono text-zinc-300">
+            <div className="border border-white/10 bg-white/[0.03] rounded-xl px-4 py-3 text-center text-xs font-mono text-zinc-300 break-all">
               {t.lastDraw.cert}: {lastDraw?.cert_code || "DP-XXXXXXXX"}
             </div>
           </div>
@@ -407,16 +407,16 @@ export default function Home() {
       </section>
 
       {/* FEATURES ACCORDION */}
-      <section id="features" className="relative z-10 max-w-7xl mx-auto px-5 pb-20">
-        <h2 className="text-3xl font-black text-center mb-8">
+      <section id="features" className="relative z-10 max-w-7xl mx-auto px-4 sm:px-5 pb-16 sm:pb-20">
+        <h2 className="text-2xl sm:text-3xl font-black text-center mb-7 sm:mb-8">
           <span className="bg-gradient-to-r from-sky-400 to-purple-400 bg-clip-text text-transparent">{h.featuresTitle}</span>
         </h2>
         <div className="grid sm:grid-cols-3 gap-4">
           {features.map((f, i) => (
             <div key={i} className="bg-white/[0.04] border border-white/10 rounded-2xl overflow-hidden cursor-pointer" onClick={() => setOpenFeature(openFeature === i ? null : i)}>
-              <div className="p-5 flex items-center justify-between">
-                <div className="font-black text-lg">{f.title}</div>
-                <span className="text-sky-400 text-xl">{openFeature === i ? "−" : "+"}</span>
+              <div className="p-5 flex items-center justify-between gap-3">
+                <div className="font-black text-base sm:text-lg">{f.title}</div>
+                <span className="text-sky-400 text-xl shrink-0">{openFeature === i ? "−" : "+"}</span>
               </div>
               {openFeature === i && (
                 <div className="px-5 pb-5 text-sm text-zinc-400 leading-relaxed border-t border-white/5 pt-3">
@@ -429,8 +429,8 @@ export default function Home() {
       </section>
 
       {/* NASIL ÇALIŞIR */}
-      <section id="nasil" className="relative z-10 max-w-7xl mx-auto px-5 pb-20">
-        <h2 className="text-3xl font-black text-center mb-8">
+      <section id="nasil" className="relative z-10 max-w-7xl mx-auto px-4 sm:px-5 pb-16 sm:pb-20">
+        <h2 className="text-2xl sm:text-3xl font-black text-center mb-7 sm:mb-8">
           <span className="bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent">{h.howTitle}</span>
         </h2>
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -451,21 +451,21 @@ export default function Home() {
       </section>
 
       {/* PRICING */}
-      <section id="pricing" className="relative z-10 max-w-7xl mx-auto px-5 pb-24">
-        <div className="text-center mb-12">
-          <h2 className="text-4xl sm:text-5xl font-black mb-4">
+      <section id="pricing" className="relative z-10 max-w-7xl mx-auto px-4 sm:px-5 pb-20 sm:pb-24">
+        <div className="text-center mb-10 sm:mb-12">
+          <h2 className="text-3xl sm:text-5xl font-black mb-4">
             <span className="bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent">{t.nav.pricing}</span>
           </h2>
-          <p className="text-zinc-400 mb-8">{h.pricingSub}</p>
+          <p className="text-zinc-400 mb-7 sm:mb-8 text-sm sm:text-base">{h.pricingSub}</p>
           <div className="inline-flex bg-[#16161f] border border-white/10 rounded-2xl p-1">
-            <button onClick={() => setPricingInterval("monthly")} className={`px-6 py-2 rounded-xl text-sm font-bold transition ${pricingInterval === "monthly" ? "bg-sky-600 text-white" : "text-zinc-400 hover:text-white"}`}>{h.monthly}</button>
-            <button onClick={() => setPricingInterval("yearly")} className={`px-6 py-2 rounded-xl text-sm font-bold transition ${pricingInterval === "yearly" ? "bg-sky-600 text-white" : "text-zinc-400 hover:text-white"}`}>
+            <button onClick={() => setPricingInterval("monthly")} className={`px-5 sm:px-6 py-2 rounded-xl text-sm font-bold transition ${pricingInterval === "monthly" ? "bg-sky-600 text-white" : "text-zinc-400 hover:text-white"}`}>{h.monthly}</button>
+            <button onClick={() => setPricingInterval("yearly")} className={`px-5 sm:px-6 py-2 rounded-xl text-sm font-bold transition ${pricingInterval === "yearly" ? "bg-sky-600 text-white" : "text-zinc-400 hover:text-white"}`}>
               {h.yearly} <span className="text-green-400 text-xs ml-1">{h.discount}</span>
             </button>
           </div>
         </div>
 
-        <div className="bg-[#141421]/90 border border-white/10 rounded-3xl p-6 mb-5 flex flex-wrap items-center justify-between gap-4">
+        <div className="bg-[#141421]/90 border border-white/10 rounded-3xl p-5 sm:p-6 mb-5 flex flex-col sm:flex-row sm:flex-wrap sm:items-center sm:justify-between gap-4">
           <div>
             <div className="font-black text-xl mb-1">🆓 Free</div>
             <div className="text-zinc-400 text-sm">{h.freeDesc}</div>
@@ -474,10 +474,10 @@ export default function Home() {
           <ul className="text-zinc-400 text-sm space-y-1">
             {h.features.free.map((f: string, i: number) => <li key={i}>✓ {f}</li>)}
           </ul>
-          <a href="/auth/login" className="bg-white/10 hover:bg-white/20 px-6 py-3 rounded-xl font-bold text-sm transition">{h.startFree}</a>
+          <a href="/auth/login" className="bg-white/10 hover:bg-white/20 px-6 py-3 rounded-xl font-bold text-sm transition text-center">{h.startFree}</a>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
           {(["starter", "pro", "business", "diamond"] as const).map((key) => {
             const plan = PLANS[key];
             const price = pricingInterval === "yearly" ? plan.yearlyPrice : plan.monthlyPrice;
@@ -490,7 +490,7 @@ export default function Home() {
                 {pricingInterval === "yearly" && <div className="text-green-400 text-xs mb-3">${Math.round(price / 12)} / {h.perMonth} — {h.save}</div>}
                 <ul className="space-y-2 mb-6 flex-1">
                   {(h.features[key] || []).map((f: string, i: number) => (
-                    <li key={i} className="text-zinc-400 text-sm flex items-center gap-2"><span className="text-green-400">✓</span> {f}</li>
+                    <li key={i} className="text-zinc-400 text-sm flex items-start gap-2"><span className="text-green-400 shrink-0">✓</span> {f}</li>
                   ))}
                 </ul>
                 <a href="/pricing" className={`block w-full text-center py-3 rounded-xl font-bold text-sm transition ${isPopular ? "bg-purple-600 hover:bg-purple-500" : "bg-sky-600 hover:bg-sky-500"}`}>{h.details}</a>
@@ -504,22 +504,22 @@ export default function Home() {
       </section>
 
       {/* İLETİŞİM */}
-      <section id="iletisim" className="relative z-10 max-w-7xl mx-auto px-5 pb-16">
-        <div className="bg-[#141421]/90 border border-white/10 rounded-3xl p-8 text-center max-w-2xl mx-auto">
+      <section id="iletisim" className="relative z-10 max-w-7xl mx-auto px-4 sm:px-5 pb-16">
+        <div className="bg-[#141421]/90 border border-white/10 rounded-3xl p-6 sm:p-8 text-center max-w-2xl mx-auto">
           <div className="text-4xl mb-4">📬</div>
           <h2 className="text-2xl font-black mb-2">{h.contactTitle}</h2>
           <p className="text-zinc-400 text-sm mb-6">{h.contactSub}</p>
           <a href="mailto:support@drawpicker.io" className="inline-block bg-gradient-to-r from-sky-600 to-sky-500 px-8 py-3 rounded-xl font-bold text-sm hover:opacity-90 transition mb-4">
             {h.contactEmail}
           </a>
-          <p className="text-zinc-500 text-xs">{h.contactNote}</p>
+          <p className="text-zinc-500 text-xs break-words">{h.contactNote}</p>
         </div>
       </section>
 
       {/* FOOTER */}
-      <footer className="relative z-10 border-t border-white/10 max-w-7xl mx-auto px-5 py-8 text-center text-zinc-600 text-sm">
+      <footer className="relative z-10 border-t border-white/10 max-w-7xl mx-auto px-4 sm:px-5 py-8 text-center text-zinc-600 text-sm">
         <p>{h.footer}</p>
-        <div className="flex justify-center gap-6 mt-3">
+        <div className="flex flex-wrap justify-center gap-4 sm:gap-6 mt-3">
           <a href="/pricing" className="hover:text-white transition">{h.footerPricing}</a>
           <a href="/dashboard" className="hover:text-white transition">{h.footerAccount}</a>
           <a href="/auth/login" className="hover:text-white transition">{h.footerLogin}</a>
