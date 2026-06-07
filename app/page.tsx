@@ -376,7 +376,7 @@ export default function Home() {
                 )}
                 <div>
                   <div className="text-zinc-400 text-sm">{t.lastDraw.winner}</div>
-                  <div className="text-2xl font-black">@{lastWinner?.username || lastWinner?.author || lastWinner?.name || lastWinner?.id || "drawpicker"}</div>
+                  <div className="text-2xl font-black">@{lastWinner?.username || lastWinner?.author || (lastWinner as any)?.name || (lastWinner as any)?.id || "drawpicker"}</div>
                   <div className="text-zinc-500 text-sm">{t.lastDraw.congrats}</div>
                 </div>
               </div>
