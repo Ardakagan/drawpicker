@@ -120,7 +120,7 @@ export const PLANS = {
   diamond: {
     name: "Pırlanta",
     drawsPerMonth: 999999,
-    maxParticipants: 1000000,
+    maxParticipants: 999999999,
     monthlyPrice: 37.99,
     yearlyPrice: 239.90,
     dodoSubMonthlyId: "pdt_0NgUpVSaixjZy5QRIAjZZ",
@@ -131,7 +131,7 @@ export const PLANS = {
     dodoOnceYearlyId: "pdt_0NgUpDuZyqvKXQAUoe4fB",
     features: [
       "Sınırsız çekiliş",
-      "1.000.000 aylık katılımcı işleme limiti",
+      "Sınırsız aylık katılımcı işleme limiti",
       "Altın tüm özellikleri",
       "7/24 öncelikli destek",
       "Özel entegrasyon & SLA",
