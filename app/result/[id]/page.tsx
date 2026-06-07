@@ -129,27 +129,47 @@ export default function ResultPage() {
 
   async function handleCopyAndShareVerificationLink() {
     const verificationUrl = window.location.href;
-    const text = `🏆 Giveaway Results\n\nWinners:\n${winners
-      .map((w) => (w.username ? `@${w.username}` : w.author || w.name || "unknown"))
-      .join("\n")}\n\n🔗 Verification:\n${verificationUrl}`;
+    
+    // handleShareOnX ile aynı shareText oluştur
+    const giveawayTitle = result?.title || result?.input_url || result?.source_url || "";
+    const shareTextParts: string[] = [rt.xShareTitle];
 
+    if (giveawayTitle) {
+      shareTextParts.push("", rt.xShareGiveaway, giveawayTitle);
+    }
+
+    shareTextParts.push("", rt.xShareWinners, ...winners.map((w) => `@${w.username}`));
+
+    if (backups?.length) {
+      shareTextParts.push("", rt.xShareBackups, ...backups.map((w) => `@${w.username}`));
+    }
+
+    shareTextParts.push("", `🔗 ${rt.xShareVerification}`, verificationUrl);
+
+    const shareText = shareTextParts.join("\n");
+
+    // Clipboard'a kopyala
     try {
       await navigator.clipboard.writeText(verificationUrl);
       setCopied(true);
       setTimeout(() => setCopied(false), 2500);
     } catch {}
 
+    // Native share varsa text ile paylaş
     if (navigator.share) {
       try {
-        await navigator.share({ title: `DrawPicker — ${rt.title}`, url: verificationUrl });
+        await navigator.share({ 
+          title: rt.xShareTitle,
+          text: shareText,
+          url: verificationUrl 
+        });
         return;
       } catch {}
     }
 
-    const shareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(
-      verificationUrl
-    )}&text=${encodeURIComponent(text)}`;
-    window.open(shareUrl, "_blank", "noopener,noreferrer");
+    // Fallback: X intent URL'si
+    const xUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`;
+    window.open(xUrl, "_blank", "noopener,noreferrer");
   }
 
   function handleShareOnX() {
