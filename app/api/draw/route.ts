@@ -14,6 +14,31 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const maxDuration = 300;
 
+// Basit global in-memory rate limiter (serverless ortamlarda kesin çözüm değildir,
+// ama temel koruma sağlar). Kullanıcı bazlı: id -> { count, resetAt }
+const drawRateLimit = new Map<string, { count: number; resetAt: number }>();
+
+function checkDrawRateLimit(userId: string) {
+  const now = Date.now();
+  const windowMs = 60 * 1000; // 60s
+  const max = 3;
+
+  const current = drawRateLimit.get(userId);
+
+  if (!current || current.resetAt < now) {
+    drawRateLimit.set(userId, { count: 1, resetAt: now + windowMs });
+    return true;
+  }
+
+  if (current.count >= max) {
+    return false;
+  }
+
+  current.count += 1;
+  drawRateLimit.set(userId, current);
+  return true;
+}
+
 function makeCertCode() {
   return "DP-" + Math.random().toString(36).substring(2, 10).toUpperCase();
 }
@@ -75,6 +100,18 @@ export async function POST(req: Request) {
       return NextResponse.json(
         { success: false, error: "login_required" },
         { status: 401 }
+      );
+    }
+
+    // Rate limit: aynı kullanıcı 60s içinde en fazla 3 çekiliş başlatabilir.
+    if (!checkDrawRateLimit(user.id)) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "rate_limited",
+          message: "Çok fazla istek. Lütfen biraz bekleyin.",
+        },
+        { status: 429 }
       );
     }
 
