@@ -326,12 +326,15 @@ export default function PricingPage() {
                 <button
                   onClick={() => handleCheckout(plan.key, "subscription")}
                   disabled={subLoading || isCurrentPlan}
-                  className={`w-full py-3 rounded-xl font-bold text-sm transition mb-2 ${isCurrentPlan ? "bg-zinc-700 text-zinc-400 cursor-default" : plan.popular ? "bg-purple-600 hover:bg-purple-500 text-white" : "bg-sky-600 hover:bg-sky-500 text-white"}`}
+                  className={`w-full py-3 px-4 rounded-xl font-bold text-sm transition mb-2 flex flex-col items-center justify-center gap-1 ${isCurrentPlan ? "bg-zinc-700 text-zinc-400 cursor-default" : plan.popular ? "bg-purple-600 hover:bg-purple-500 text-white" : "bg-sky-600 hover:bg-sky-500 text-white"}`}
                 >
-                  {subLoading ? `⏳ ${txt.loading}` : isCurrentPlan ? `✓ ${txt.current}` : txt.subBtn}
+                  <span>
+                    {subLoading ? `⏳ ${txt.loading}` : isCurrentPlan ? `✓ ${txt.current}` : txt.subBtn}
+                  </span>
+                  {!subLoading && !isCurrentPlan && (
+                    <span className="text-xs font-normal opacity-90">{txt.subNote}</span>
+                  )}
                 </button>
-
-                <p className="text-center text-blue-300 bg-blue-500/15 px-3 py-1.5 rounded-full text-xs font-medium mt-2 border border-blue-500/30">{txt.subNote}</p>
 
                 {/* Tek seferlik (kripto) */}
                 <button
