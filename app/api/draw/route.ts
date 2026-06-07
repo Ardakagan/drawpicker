@@ -250,6 +250,7 @@ export async function POST(req: Request) {
     let eligible = 0;
     let truncated = false;
     let twitterStats: any = null;
+    let drawOwnerUsername = "";
     let participantLimitReached = false;
 
     const seen = new Set<string>();
@@ -278,6 +279,16 @@ export async function POST(req: Request) {
             : undefined,
           name: raw.name ?? raw.author ?? raw.username ?? "Bilinmeyen",
         } as User;
+
+        // Çekiliş sahibi aday olamaz / kazanamaz
+        const candidateUsername = String(u.username || u.author || u.name || "")
+          .replace("@", "")
+          .toLowerCase()
+          .trim();
+
+        if (drawOwnerUsername && candidateUsername === drawOwnerUsername) {
+          continue;
+        }
 
         if (!applyLocalFilters(u, rules, excludedList)) continue;
 
@@ -343,15 +354,17 @@ export async function POST(req: Request) {
       twitterStats = await getTwitterTweetStats(input, apiKey);
 
       // Çekiliş sahibini aday listesinden çıkar
-      const ownerUsername = String(
+      drawOwnerUsername = String(
         twitterStats?.authorUsername ||
+        twitterStats?.author_username ||
         twitterStats?.username ||
+        twitterStats?.screen_name ||
         twitterStats?.author ||
         ""
       ).replace("@", "").toLowerCase().trim();
 
-      if (ownerUsername) {
-        excludedList.push(ownerUsername);
+      if (drawOwnerUsername) {
+        excludedList.push(drawOwnerUsername);
       }
 
       truncated = await collectTwitter(input, rules, apiKey, onUsers, deadline);
