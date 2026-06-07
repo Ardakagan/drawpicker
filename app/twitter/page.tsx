@@ -13,106 +13,40 @@ const config = {
   inputKey: "tw_input",
   inputPhKey: "tw_inputPh",
 
-  // FREE: sadece beğeni + retweet
+  // FREE: beğeni + retweet + yorum  |  BRONZ: + takip
   quickRules: [
-    {
-      key: "mustLike",
-      icon: "❤️",
-      plan: "free",
-    },
-    {
-      key: "mustRetweet",
-      icon: "🔁",
-      plan: "free",
-    },
-    {
-      key: "mustComment",
-      icon: "💬",
-      plan: "starter",
-    },
-    {
-      key: "mustFollow",
-      icon: "👤",
-      plan: "starter",
-    },
+    { key: "mustLike", icon: "❤️", plan: "free" },
+    { key: "mustRetweet", icon: "🔁", plan: "free" },
+    { key: "mustComment", icon: "💬", plan: "free" },
+    { key: "mustFollow", icon: "👤", plan: "free" },
   ],
 
-  // STARTER / PRO / BUSINESS gelişmiş kurallar
   advancedRules: [
-    {
-      key: "mustMention",
-      icon: "🏷️",
-      plan: "starter",
-    },
-    {
-      key: "mustKeyword",
-      icon: "🔑",
-      plan: "starter",
-    },
-    {
-      key: "mustExtraFollow",
-      icon: "👥",
-      plan: "pro",
-      input: "extraFollowAccount",
-    },
-    {
-      key: "mustProfile",
-      icon: "📸",
-      plan: "pro",
-    },
-    {
-      key: "mustMinFollowers",
-      icon: "👥",
-      plan: "pro",
-      input: "minFollowers",
-    },
-    {
-      key: "mustMinLength",
-      icon: "✍️",
-      plan: "pro",
-      input: "minLength",
-    },
-    {
-      key: "uniqueComments",
-      icon: "🔄",
-      plan: "pro",
-    },
-    {
-      key: "aiSafe",
-      icon: "🤖",
-      plan: "pro",
-    },
-    {
-      key: "mustAccountAge",
-      icon: "📅",
-      plan: "business",
-      input: "accountAgeDays",
-    },
-    {
-      key: "blockHidden",
-      icon: "🔓",
-      plan: "business",
-    },
-    {
-      key: "advancedBotFilter",
-      icon: "🛡️",
-      plan: "business",
-    },
+    { key: "mustKeyword", icon: "🔑", plan: "free", input: "keyword" },
+    { key: "mustMention", icon: "🏷️", plan: "free", input: "mentionUsername" },
+    { key: "mustMinLength", icon: "✍️", plan: "free", input: "minLength" },
+    { key: "uniqueComments", icon: "🔄", plan: "free" },
+    { key: "mustProfile", icon: "📸", plan: "free" },
+    { key: "mustMinFollowers", icon: "👥", plan: "free", input: "minFollowers" },
+    { key: "mustExtraFollow", icon: "➕", plan: "free", input: "extraFollowAccount" },
+    { key: "aiSafe", icon: "🤖", plan: "free" },
+    { key: "mustAccountAge", icon: "📅", plan: "free", input: "accountAgeDays" },
+    { key: "blockHidden", icon: "🔓", plan: "free" },
+    { key: "advancedBotFilter", icon: "🛡️", plan: "free" },
   ],
 
-  // Eski sistemle uyum için bırakıyoruz
   ruleDefs: [
     { key: "mustLike" },
     { key: "mustRetweet" },
     { key: "mustComment" },
     { key: "mustFollow" },
-    { key: "mustMention" },
     { key: "mustKeyword" },
-    { key: "mustExtraFollow" },
-    { key: "mustProfile" },
-    { key: "mustMinFollowers" },
+    { key: "mustMention" },
     { key: "mustMinLength" },
     { key: "uniqueComments" },
+    { key: "mustProfile" },
+    { key: "mustMinFollowers" },
+    { key: "mustExtraFollow" },
     { key: "aiSafe" },
     { key: "mustAccountAge" },
     { key: "blockHidden" },

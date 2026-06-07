@@ -27,7 +27,7 @@ export async function POST(req: Request) {
     const mode = metadata.mode === "one_time" ? "one_time" : "subscription";
     const subscriptionId = body.data?.id || body.subscription_id;
 
-    const validPlans = ["starter", "pro", "business", "free"];
+    const validPlans = ["starter", "pro", "business", "diamond", "free"];
     const normalizedPlan = typeof plan === "string" ? plan.toLowerCase().trim() : undefined;
 
     if (!userId || !normalizedPlan || !validPlans.includes(normalizedPlan)) {

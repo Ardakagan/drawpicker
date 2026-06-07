@@ -13,7 +13,7 @@ const ACCENT: Record<string, any> = {
   purple: { text: "text-purple-400", ring: "focus:border-purple-500", btn: "from-purple-600 to-purple-500", shadow: "shadow-purple-500/20", solid: "bg-purple-600 hover:bg-purple-500", hover: "hover:border-purple-500", ruleOn: "border-purple-500 bg-purple-500/10", chk: "bg-purple-500", check: "text-purple-400" },
 };
 
-const PLAN_LEVEL: Record<string, number> = { free: 0, starter: 1, pro: 2, business: 3 };
+const PLAN_LEVEL: Record<string, number> = { free: 0, starter: 1, pro: 2, business: 3, diamond: 4 };
 
 function canUse(userPlan: string, rulePlan?: string) {
   const up = String(userPlan || "free").toLowerCase().trim();
