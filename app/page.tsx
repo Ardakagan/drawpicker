@@ -270,7 +270,7 @@ export default function Home() {
     if (saved) setLang(saved);
     const supabase = createClient();
     supabase.auth.getUser().then(({ data }) => setUser(data.user));
-    supabase.from("draw_results").select("*").order("created_at", { ascending: false }).limit(1).single().then(({ data }) => { if (data) setLastDraw(data); });
+    fetch("/api/latest-result").then((r) => r.json()).then((data) => { if (data.result) setLastDraw(data.result); }).catch(() => {});
   }, []);
 
   async function handleLogout() {
@@ -376,7 +376,7 @@ export default function Home() {
                 )}
                 <div>
                   <div className="text-zinc-400 text-sm">{t.lastDraw.winner}</div>
-                  <div className="text-2xl font-black">@{lastWinner?.username || "drawpicker"}</div>
+                  <div className="text-2xl font-black">@{lastWinner?.username || lastWinner?.author || lastWinner?.name || lastWinner?.id || "drawpicker"}</div>
                   <div className="text-zinc-500 text-sm">{t.lastDraw.congrats}</div>
                 </div>
               </div>
