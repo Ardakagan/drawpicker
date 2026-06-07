@@ -14,31 +14,6 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const maxDuration = 300;
 
-// Basit global in-memory rate limiter (serverless ortamlarda kesin çözüm değildir,
-// ama temel koruma sağlar). Kullanıcı bazlı: id -> { count, resetAt }
-const drawRateLimit = new Map<string, { count: number; resetAt: number }>();
-
-function checkDrawRateLimit(userId: string) {
-  const now = Date.now();
-  const windowMs = 60 * 1000; // 60s
-  const max = 3;
-
-  const current = drawRateLimit.get(userId);
-
-  if (!current || current.resetAt < now) {
-    drawRateLimit.set(userId, { count: 1, resetAt: now + windowMs });
-    return true;
-  }
-
-  if (current.count >= max) {
-    return false;
-  }
-
-  current.count += 1;
-  drawRateLimit.set(userId, current);
-  return true;
-}
-
 function makeCertCode() {
   return "DP-" + Math.random().toString(36).substring(2, 10).toUpperCase();
 }
@@ -100,18 +75,6 @@ export async function POST(req: Request) {
       return NextResponse.json(
         { success: false, error: "login_required" },
         { status: 401 }
-      );
-    }
-
-    // Rate limit: aynı kullanıcı 60s içinde en fazla 3 çekiliş başlatabilir.
-    if (!checkDrawRateLimit(user.id)) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "rate_limited",
-          message: "Çok fazla istek. Lütfen biraz bekleyin.",
-        },
-        { status: 429 }
       );
     }
 
@@ -232,6 +195,29 @@ export async function POST(req: Request) {
       );
     }
 
+    let excludedList: string[] = Array.isArray(excluded) ? [...excluded] : [];
+    if ((rules as any).excludePastWinners) {
+      try {
+        const { data: pastDraws } = await admin
+          .from("draw_results")
+          .select("winners")
+          .eq("user_id", user.id)
+          .limit(500);
+        if (Array.isArray(pastDraws)) {
+          for (const d of pastDraws) {
+            const ws = Array.isArray((d as any).winners) ? (d as any).winners : [];
+            for (const w of ws) {
+              const un = String(w?.username || "").replace("@", "").toLowerCase().trim();
+              if (un) excludedList.push(un);
+              const uid = String(w?.userId || w?.id || "").trim();
+              if (uid) excludedList.push(uid);
+            }
+          }
+        }
+        (rules as any).blockPrevious = true;
+      } catch {}
+    }
+
     const selectedRules = Object.entries(rules)
       .filter(([key, value]) => isRuleKey(key) && Boolean(value))
       .map(([key]) => key);
@@ -267,7 +253,7 @@ export async function POST(req: Request) {
     let participantLimitReached = false;
 
     const seen = new Set<string>();
-    const dedupe = platform === "twitter" ? true : rules.uniqueComments !== false;
+    const dedupe = (platform === "twitter" ? true : rules.uniqueComments !== false) || Boolean((rules as any).uniqueUsers);
 
     const onUsers = (users: User[]) => {
       if (!Array.isArray(users)) return;
@@ -293,7 +279,7 @@ export async function POST(req: Request) {
           name: raw.name ?? raw.author ?? raw.username ?? "Bilinmeyen",
         } as User;
 
-        if (!applyLocalFilters(u, rules, excluded)) continue;
+        if (!applyLocalFilters(u, rules, excludedList)) continue;
 
         if (dedupe) {
           const key = userKey(u) || u.id || u.username || JSON.stringify(u);

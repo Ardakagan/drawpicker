@@ -27,7 +27,7 @@ export const PLANS = {
       "Retweet kontrolü",
       "Sonuç sertifikası",
     ],
-    allowedRules: ["mustLike", "mustRetweet", "mustComment", "mustFollow", "mustKeyword", "mustMention", "mustMinLength", "uniqueComments", "mustProfile", "mustMinFollowers", "mustExtraFollow", "aiSafe", "mustAccountAge", "blockHidden", "advancedBotFilter"],
+    allowedRules: ["mustLike", "mustRetweet", "mustComment", "mustFollow", "mustKeyword", "mustMention", "mustMinLength", "uniqueComments", "mustProfile", "mustMinFollowers", "mustExtraFollow", "aiSafe", "mustAccountAge", "blockHidden", "advancedBotFilter", "mustName", "mustBio", "mustMinMentions", "mustMinPosts"],
   },
 
   starter: {
@@ -57,7 +57,7 @@ export const PLANS = {
       "CSV export",
       "Sonuç sertifikası",
     ],
-    allowedRules: ["mustLike", "mustRetweet", "mustComment", "mustFollow", "mustKeyword", "mustMention", "mustMinLength", "uniqueComments", "mustProfile", "mustMinFollowers", "mustExtraFollow", "aiSafe", "mustAccountAge", "blockHidden", "advancedBotFilter"],
+    allowedRules: ["mustLike", "mustRetweet", "mustComment", "mustFollow", "mustKeyword", "mustMention", "mustMinLength", "uniqueComments", "mustProfile", "mustMinFollowers", "mustExtraFollow", "aiSafe", "mustAccountAge", "blockHidden", "advancedBotFilter", "mustName", "mustBio", "mustMinMentions", "mustMinPosts"],
   },
 
   pro: {
@@ -86,7 +86,7 @@ export const PLANS = {
       "Geçmiş çekilişler",
       "Öncelikli tarama",
     ],
-    allowedRules: ["mustLike", "mustRetweet", "mustComment", "mustFollow", "mustKeyword", "mustMention", "mustMinLength", "uniqueComments", "mustProfile", "mustMinFollowers", "mustExtraFollow", "aiSafe", "mustAccountAge", "blockHidden", "advancedBotFilter"],
+    allowedRules: ["mustLike", "mustRetweet", "mustComment", "mustFollow", "mustKeyword", "mustMention", "mustMinLength", "uniqueComments", "mustProfile", "mustMinFollowers", "mustExtraFollow", "aiSafe", "mustAccountAge", "blockHidden", "advancedBotFilter", "mustName", "mustBio", "mustMinMentions", "mustMinPosts"],
   },
 
   business: {
@@ -114,7 +114,7 @@ export const PLANS = {
       "White Label",
       "Özel destek",
     ],
-    allowedRules: ["mustLike", "mustRetweet", "mustComment", "mustFollow", "mustKeyword", "mustMention", "mustMinLength", "uniqueComments", "mustProfile", "mustMinFollowers", "mustExtraFollow", "aiSafe", "mustAccountAge", "blockHidden", "advancedBotFilter"],
+    allowedRules: ["mustLike", "mustRetweet", "mustComment", "mustFollow", "mustKeyword", "mustMention", "mustMinLength", "uniqueComments", "mustProfile", "mustMinFollowers", "mustExtraFollow", "aiSafe", "mustAccountAge", "blockHidden", "advancedBotFilter", "mustName", "mustBio", "mustMinMentions", "mustMinPosts"],
   },
 
   diamond: {
@@ -137,7 +137,7 @@ export const PLANS = {
       "Özel entegrasyon & SLA",
       "En yüksek tarama önceliği",
     ],
-    allowedRules: ["mustLike", "mustRetweet", "mustComment", "mustFollow", "mustKeyword", "mustMention", "mustMinLength", "uniqueComments", "mustProfile", "mustMinFollowers", "mustExtraFollow", "aiSafe", "mustAccountAge", "blockHidden", "advancedBotFilter"],
+    allowedRules: ["mustLike", "mustRetweet", "mustComment", "mustFollow", "mustKeyword", "mustMention", "mustMinLength", "uniqueComments", "mustProfile", "mustMinFollowers", "mustExtraFollow", "aiSafe", "mustAccountAge", "blockHidden", "advancedBotFilter", "mustName", "mustBio", "mustMinMentions", "mustMinPosts"],
   },
 } as const;
 

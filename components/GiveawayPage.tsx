@@ -29,8 +29,26 @@ function getRuleInput(key: string) {
     mustMinFollowers: { field: "minFollowers", type: "number", placeholder: "örn: 100" },
     mustMinLength: { field: "minLength", type: "number", placeholder: "örn: 10" },
     mustAccountAge: { field: "accountAgeDays", type: "number", placeholder: "örn: 30 gün" },
+    mustMinMentions: { field: "minMentions", type: "number", placeholder: "örn: 2" },
+    mustMinPosts: { field: "minPosts", type: "number", placeholder: "örn: 5" },
   };
   return map[key] || null;
+}
+
+const EXTRA_RULE_LABELS: Record<string, Record<string, string>> = {
+  excludePastWinners: { tr: "Geçmiş kazananları hariç tut", en: "Exclude past winners", de: "Frühere Gewinner ausschließen", fr: "Exclure les anciens gagnants", es: "Excluir ganadores anteriores", it: "Escludi vincitori precedenti", ru: "Исключить прошлых победителей", zh: "排除往期获奖者", ko: "이전 당첨자 제외", pl: "Wyklucz poprzednich zwycięzców", ro: "Exclude câștigătorii anteriori", el: "Εξαίρεση προηγούμενων νικητών" },
+  uniqueUsers: { tr: "Her kullanıcıyı 1 kez say", en: "Count each user once", de: "Jeden Nutzer einmal zählen", fr: "Compter chaque utilisateur une fois", es: "Contar cada usuario una vez", it: "Conta ogni utente una volta", ru: "Считать каждого пользователя один раз", zh: "每位用户只计一次", ko: "사용자당 1회만 집계", pl: "Licz każdego użytkownika raz", ro: "Numără fiecare utilizator o dată", el: "Μέτρηση κάθε χρήστη μία φορά" },
+  mustName: { tr: "Profilde isim olmalı", en: "Must have a name", de: "Muss einen Namen haben", fr: "Doit avoir un nom", es: "Debe tener nombre", it: "Deve avere un nome", ru: "Должно быть имя", zh: "必须有昵称", ko: "이름이 있어야 함", pl: "Musi mieć imię", ro: "Trebuie să aibă nume", el: "Πρέπει να έχει όνομα" },
+  mustBio: { tr: "Biyografi dolu olmalı", en: "Must have a bio", de: "Muss eine Bio haben", fr: "Doit avoir une bio", es: "Debe tener biografía", it: "Deve avere una bio", ru: "Должна быть биография", zh: "必须填写简介", ko: "소개글이 있어야 함", pl: "Musi mieć bio", ro: "Trebuie să aibă biografie", el: "Πρέπει να έχει βιογραφικό" },
+  mustMinMentions: { tr: "En az etiket sayısı", en: "Minimum mentions", de: "Mindestanzahl Markierungen", fr: "Mentions minimum", es: "Menciones mínimas", it: "Menzioni minime", ru: "Мин. упоминаний", zh: "最少标记数", ko: "최소 태그 수", pl: "Min. oznaczeń", ro: "Mențiuni minime", el: "Ελάχιστες αναφορές" },
+  mustMinPosts: { tr: "En az gönderi sayısı", en: "Minimum posts", de: "Mindestanzahl Beiträge", fr: "Publications minimum", es: "Publicaciones mínimas", it: "Post minimi", ru: "Мин. постов", zh: "最少发帖数", ko: "최소 게시물 수", pl: "Min. postów", ro: "Postări minime", el: "Ελάχιστες δημοσιεύσεις" },
+};
+
+function ruleLabel(t: any, lang: string, key: string) {
+  const base = t("r_" + key);
+  if (base !== "r_" + key) return base;
+  const ex = EXTRA_RULE_LABELS[key];
+  return ex ? (ex[lang] || ex.en) : key;
 }
 
 const NEW_DRAW_LABELS: Record<string, string> = {
@@ -107,7 +125,7 @@ export default function GiveawayPage({ config }: any) {
     const isActive = Boolean(rules[rule.key]);
     return (
       <div key={rule.key}>
-        <Rule label={`${rule.icon || ""} ${t("r_" + rule.key)}`} val={Boolean(rules[rule.key])} toggle={() => toggle(rule)} fixed={rule.fixed} locked={locked} plan={rule.plan || "free"} onClass={a.ruleOn} chkClass={a.chk} />
+        <Rule label={`${rule.icon || ""} ${ruleLabel(t, lang, rule.key)}`} val={Boolean(rules[rule.key])} toggle={() => toggle(rule)} fixed={rule.fixed} locked={locked} plan={rule.plan || "free"} onClass={a.ruleOn} chkClass={a.chk} />
         {isActive && !locked && inputDef && (
           <input type={inputDef.type} value={rules[inputDef.field] || ""} onChange={(e) => setRuleValue(inputDef.field, e.target.value)} placeholder={inputDef.placeholder} className={`w-full mt-2 bg-[#0a0a0f] border border-white/10 rounded-xl px-3 py-2 text-sm outline-none ${a.ring} transition`} />
         )}

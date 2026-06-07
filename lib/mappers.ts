@@ -15,6 +15,8 @@ export function mapUser(u: any): User {
     profilePicture: user.profile_image_url_https || user.profile_image_url || "",
     isPrivate: Boolean(user.protected),
     followers: Number(user.followers_count || 0),
+    posts: Number(user.statuses_count || 0) || undefined,
+    bio: String(user.description || "").trim(),
   };
 }
 
@@ -39,6 +41,8 @@ export function mapComment(t: any): User {
       t.user?.profile_image_url_https || t.author?.profile_image_url || "",
     isPrivate: Boolean(t.user?.protected || t.author?.protected),
     followers: Number(t.user?.followers_count || t.author?.followers_count || 0),
+    posts: Number(t.user?.statuses_count || t.author?.statuses_count || 0) || undefined,
+    bio: String(t.user?.description || t.author?.description || "").trim(),
   };
 }
 

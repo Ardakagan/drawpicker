@@ -17,6 +17,8 @@ export type User = {
 
   isPrivate?: boolean;
   followers?: number;
+  posts?: number;
+  bio?: string;
   createdAt?: string;
 };
 
@@ -42,12 +44,22 @@ export type Rules = {
   aiSafe?: boolean;
   uniqueComments?: boolean;
 
+  // YENI kurallar
+  excludePastWinners?: boolean;
+  uniqueUsers?: boolean;
+  mustName?: boolean;
+  mustBio?: boolean;
+  mustMinMentions?: boolean;
+  mustMinPosts?: boolean;
+
   keyword?: string;
   mentionUsername?: string;
   extraFollowAccount?: string;
 
   minLength?: number | string;
   minLen?: number | string;
+  minMentions?: number | string;
+  minPosts?: number | string;
 
   minFollowers?: number | string;
   accountAgeDays?: number | string;
