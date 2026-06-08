@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { Analytics } from "@vercel/analytics/react";
 
 export const metadata: Metadata = {
   title: "DrawPicker — Sosyal Medya Çekiliş Aracı",
@@ -9,7 +10,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="tr">
-      <body className="bg-[#0a0a0f] text-white antialiased">{children}</body>
+      <body className="bg-[#0a0a0f] text-white antialiased">{children}<Analytics /></body>
     </html>
   );
 }
