@@ -62,7 +62,7 @@ function getAuthorAvatar(user: any) {
 
 async function fetchJson(url: string, apiKey: string, attempt = 0): Promise<any> {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 20000);
+  const timeout = setTimeout(() => controller.abort(), 45000);
 
   try {
     const res = await fetch(url, {
