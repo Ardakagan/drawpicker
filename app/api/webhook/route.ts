@@ -28,6 +28,34 @@ export async function POST(req: Request) {
     const mode = metadata.mode === "one_time" ? "one_time" : "subscription";
     const subscriptionId = body.data?.id || body.subscription_id;
 
+    // Idempotency: derive a unique event/payment id from common locations
+    const eventId =
+      body.id ||
+      body.event_id ||
+      body.data?.id ||
+      body.data?.payment_id ||
+      body.data?.checkout_id ||
+      body.payment_id ||
+      body.checkout_id ||
+      null;
+
+    if (eventId) {
+      const { error: eventInsertError } = await supabase
+        .from("webhook_events")
+        .insert({ id: String(eventId), provider: "dodo", event_type: eventType || "unknown" });
+
+      if (eventInsertError) {
+        // Postgres unique violation
+        if (String((eventInsertError as any).code) === "23505") {
+          return NextResponse.json({ received: true, duplicate: true });
+        }
+        console.error("WEBHOOK EVENT INSERT ERROR:", eventInsertError);
+        return NextResponse.json({ error: "Webhook event log failed" }, { status: 500 });
+      }
+    } else {
+      console.warn("Webhook event id missing; idempotency skipped");
+    }
+
     // Try to derive product_id from common payload locations
     const productIdRaw =
       body.data?.product_id ||
