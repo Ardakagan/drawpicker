@@ -373,7 +373,7 @@ export async function POST(req: Request) {
 
     const scanSeconds = ((Date.now() - scanStart) / 1000).toFixed(1);
     console.log(
-      `[CEKILIS] platform=${platform} taranan=${total} uygun=${eligible} sure=${scanSeconds}s kismi=${truncated}`
+      `[CEKILIS] platform=${platform} taranan=${total} uygun=${eligible} sure=${scanSeconds}s kismi=${truncated} limitDoldu=${participantLimitReached} kalanHak=${remainingParticipants} aylikLimit=${plan.maxParticipants} plan=${userPlanKey}`
     );
 
     const picked = reservoir.shuffled();
