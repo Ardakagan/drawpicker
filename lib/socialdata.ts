@@ -233,6 +233,7 @@ async function streamPaged(
     //await sleep(120);
   }
 
+  console.log(`[SocialData] cekilen_sayfa=${pages} kismi=${truncated}`);
   return truncated;
 }
 

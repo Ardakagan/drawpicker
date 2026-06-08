@@ -245,6 +245,7 @@ export async function POST(req: Request) {
     const need = Math.max(winnerNum + backupNum, 1);
     const reservoir = new Reservoir(need);
     const deadline = Date.now() + 30000;
+    const scanStart = Date.now();
 
     let total = 0;
     let eligible = 0;
@@ -369,6 +370,11 @@ export async function POST(req: Request) {
 
       truncated = await collectTwitter(input, rules, apiKey, onUsers, deadline);
     }
+
+    const scanSeconds = ((Date.now() - scanStart) / 1000).toFixed(1);
+    console.log(
+      `[CEKILIS] platform=${platform} taranan=${total} uygun=${eligible} sure=${scanSeconds}s kismi=${truncated}`
+    );
 
     const picked = reservoir.shuffled();
 
