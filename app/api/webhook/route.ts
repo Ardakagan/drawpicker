@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase";
+import { getPlanByDodoProductId } from "@/lib/plans";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -22,15 +23,38 @@ export async function POST(req: Request) {
     const eventType = body.type || body.event_type;
     const metadata = body.data?.metadata || body.metadata || {};
     const userId = metadata.user_id;
-    const plan = metadata.plan;
+    const metadataPlan = typeof metadata.plan === "string" ? metadata.plan.toLowerCase().trim() : undefined;
     const interval = metadata.interval || "monthly";
     const mode = metadata.mode === "one_time" ? "one_time" : "subscription";
     const subscriptionId = body.data?.id || body.subscription_id;
 
-    const validPlans = ["starter", "pro", "business", "diamond", "free"];
-    const normalizedPlan = typeof plan === "string" ? plan.toLowerCase().trim() : undefined;
+    // Try to derive product_id from common payload locations
+    const productIdRaw =
+      body.data?.product_id ||
+      body.data?.product?.id ||
+      body.data?.items?.[0]?.product_id ||
+      body.data?.product_cart?.[0]?.product_id ||
+      body.product_id ||
+      body.product?.id ||
+      null;
 
-    if (!userId || !normalizedPlan || !validPlans.includes(normalizedPlan)) {
+    const productId = productIdRaw ? String(productIdRaw).trim() : null;
+
+    let planFromProduct: string | null = null;
+    if (productId) {
+      planFromProduct = getPlanByDodoProductId(productId);
+      if (!planFromProduct) {
+        // Unknown product - do not upgrade user
+        return NextResponse.json({ received: true, ignored: "unknown_product" });
+      }
+    }
+
+    // Allowed metadata plan values (legacy product matching is authoritative)
+    const allowedMetadataPlans = ["bronze", "silver", "gold", "diamond", "free"];
+
+    const normalizedPlan = planFromProduct || (allowedMetadataPlans.includes(metadataPlan || "") ? metadataPlan : undefined);
+
+    if (!userId || !normalizedPlan) {
       return NextResponse.json({ received: true });
     }
 

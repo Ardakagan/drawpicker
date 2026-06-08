@@ -160,6 +160,28 @@ export function getDodoProductId(
   return interval === "yearly" ? p.dodoSubYearlyId : p.dodoSubMonthlyId;
 }
 
+export function getPlanByDodoProductId(productId: string) {
+  const id = String(productId || "").trim();
+  if (!id) return null;
+
+  for (const [planKey, plan] of Object.entries(PLANS)) {
+    const candidates = [
+      (plan as any).dodoSubMonthlyId,
+      (plan as any).dodoSubYearlyId,
+      (plan as any).dodoOnceMonthlyId,
+      (plan as any).dodoOnceYearlyId,
+      (plan as any).dodoMonthlyId,
+      (plan as any).dodoYearlyId,
+    ].filter(Boolean);
+
+    if (candidates.includes(id)) {
+      return planKey as PlanKey;
+    }
+  }
+
+  return null;
+}
+
 export function canDraw(
   plan: string,
   drawsThisMonth: number,

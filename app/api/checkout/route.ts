@@ -32,6 +32,11 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Geçersiz plan" }, { status: 400 });
     }
 
+    // Do not create checkout for the free plan
+    if (plan === "free") {
+      return NextResponse.json({ error: "Cannot create checkout for free plan" }, { status: 400 });
+    }
+
     const billingMode: "subscription" | "one_time" =
       mode === "one_time" ? "one_time" : "subscription";
     const billingInterval: "monthly" | "yearly" =
