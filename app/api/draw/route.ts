@@ -244,7 +244,7 @@ export async function POST(req: Request) {
 
     const need = Math.max(winnerNum + backupNum, 1);
     const reservoir = new Reservoir(need);
-    const deadline = Date.now() + 50000;
+    const deadline = Date.now() + 30000;
     const scanStart = Date.now();
 
     let total = 0;
