@@ -271,7 +271,7 @@ export default function Home() {
     if (saved) setLang(saved);
     const supabase = createClient();
     supabase.auth.getUser().then(({ data }) => setUser(data.user));
-    fetch("/api/last-draw", { cache: "no-store" }).then((r) => r.json()).then((d) => { if (d?.lastDraw) setLastDraw(d.lastDraw); }).catch(() => {});
+    fetch("/api/last-draw?t=" + Date.now(), { cache: "no-store" }).then((r) => r.json()).then((d) => { if (d?.lastDraw) setLastDraw(d.lastDraw); }).catch(() => {});
   }, []);
 
   async function handleLogout() {
