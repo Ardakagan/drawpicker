@@ -211,7 +211,9 @@ async function streamPaged(
           )}`
         : "");
 
+    const __t0 = Date.now();
     const data = await fetchJson(url, apiKey);
+    console.log("[SD-PAGE] sayfa=" + (pages + 1) + " ms=" + (Date.now() - __t0));
 
     const items =
       data.users ||

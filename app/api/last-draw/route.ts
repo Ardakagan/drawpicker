@@ -14,7 +14,7 @@ export async function GET() {
       .limit(1);
 
     const last = Array.isArray(data) && data.length > 0 ? data[0] : null;
-    return NextResponse.json({ success: true, lastDraw: last });
+    return NextResponse.json({ success: true, lastDraw: last }, { headers: { "Cache-Control": "no-store" } });
   } catch (e: any) {
     return NextResponse.json({ success: false, lastDraw: null });
   }
