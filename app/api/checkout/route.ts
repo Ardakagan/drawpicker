@@ -27,6 +27,68 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "login_required" }, { status: 401 });
     }
 
+    // Rate limiting: max 10 checkout requests per user per 10 minutes
+    try {
+      const windowMinutes = 10;
+      const now = new Date();
+
+      const { data: rlRow, error: rlSelectError } = await supabase
+        .from("checkout_rate_limits")
+        .select("user_id, request_count, window_start")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      if (rlSelectError) {
+        console.error("RATE LIMIT SELECT ERROR:", rlSelectError);
+        return NextResponse.json({ error: "rate_limit_check_failed" }, { status: 500 });
+      }
+
+      if (!rlRow) {
+        const { error: insertErr } = await supabase.from("checkout_rate_limits").insert({
+          user_id: user.id,
+          request_count: 1,
+          window_start: now.toISOString(),
+        });
+        if (insertErr) {
+          console.error("RATE LIMIT INSERT ERROR:", insertErr);
+          return NextResponse.json({ error: "rate_limit_check_failed" }, { status: 500 });
+        }
+      } else {
+        const windowStart = new Date(rlRow.window_start || now.toISOString());
+        const windowEnd = new Date(windowStart.getTime() + windowMinutes * 60 * 1000);
+
+        if (now > windowEnd) {
+          // Window expired -> reset
+          const { error: resetErr } = await supabase
+            .from("checkout_rate_limits")
+            .update({ request_count: 1, window_start: now.toISOString() })
+            .eq("user_id", user.id);
+          if (resetErr) {
+            console.error("RATE LIMIT RESET ERROR:", resetErr);
+            return NextResponse.json({ error: "rate_limit_check_failed" }, { status: 500 });
+          }
+        } else {
+          // Window active
+          const count = Number(rlRow.request_count || 0);
+          if (count >= 10) {
+            return NextResponse.json({ error: "too_many_requests" }, { status: 429 });
+          }
+
+          const { error: incErr } = await supabase
+            .from("checkout_rate_limits")
+            .update({ request_count: count + 1 })
+            .eq("user_id", user.id);
+          if (incErr) {
+            console.error("RATE LIMIT INC ERROR:", incErr);
+            return NextResponse.json({ error: "rate_limit_check_failed" }, { status: 500 });
+          }
+        }
+      }
+    } catch (e) {
+      console.error("RATE LIMIT UNKNOWN ERROR:", e);
+      return NextResponse.json({ error: "rate_limit_check_failed" }, { status: 500 });
+    }
+
     const planData = PLANS[plan as PlanKey];
     if (!planData) {
       return NextResponse.json({ error: "Geçersiz plan" }, { status: 400 });
