@@ -310,7 +310,7 @@ export default function Home() {
           <a href="/pricing" className="hover:text-white text-pink-400">{t.nav.pricing}</a>
           <a href="#iletisim" className="hover:text-white">{t.nav.contact}</a>
         </div>
-        <div className="relative z-[10000] flex items-center gap-2 sm:gap-3 shrink-0">
+        <div className="relative z-[10000] flex flex-wrap items-center gap-2 sm:gap-3 shrink-0">
           <LangPicker lang={lang} setLang={setLang} accentHover="hover:border-sky-500" accentCheck="text-sky-400" />
           {user ? (
             <div className="flex items-center gap-2">
@@ -318,7 +318,10 @@ export default function Home() {
               <button onClick={handleLogout} className="text-xs sm:text-sm border border-white/10 hover:border-red-500 px-3 sm:px-4 py-2 rounded-xl transition text-zinc-300 hover:text-red-400">{t.nav.logout}</button>
             </div>
           ) : (
-            <a href="/auth/login" className="text-xs sm:text-sm font-black px-4 sm:px-5 py-2 rounded-xl border border-white/10 hover:border-cyan-400 transition whitespace-nowrap">{t.nav.login}</a>
+            <>
+              <a href="/auth/login" className="text-xs sm:text-sm font-black px-4 sm:px-5 py-2 rounded-xl border border-white/10 hover:border-cyan-400 transition whitespace-nowrap">{t.nav.login}</a>
+              <a href="/auth/register" className="text-xs sm:text-sm font-black px-4 sm:px-5 py-2 rounded-xl bg-gradient-to-r from-sky-500 via-cyan-400 to-blue-400 hover:opacity-95 transition text-slate-950 whitespace-nowrap">{t.nav.signupFree}</a>
+            </>
           )}
           <button onClick={() => setMenuOpen(!menuOpen)} aria-label="Menu" className="md:hidden flex items-center justify-center w-10 h-10 rounded-xl border border-white/10 text-zinc-200 hover:border-sky-500 transition">
             <span className="text-lg leading-none">{menuOpen ? "✕" : "☰"}</span>
@@ -335,6 +338,12 @@ export default function Home() {
             <a href="#nasil" onClick={() => setMenuOpen(false)} className="px-4 py-3 rounded-xl hover:bg-white/5 transition">{t.nav.how}</a>
             <a href="/pricing" onClick={() => setMenuOpen(false)} className="px-4 py-3 rounded-xl hover:bg-white/5 transition text-pink-400">{t.nav.pricing}</a>
             <a href="#iletisim" onClick={() => setMenuOpen(false)} className="px-4 py-3 rounded-xl hover:bg-white/5 transition">{t.nav.contact}</a>
+            {!user && (
+              <>
+                <a href="/auth/login" onClick={() => setMenuOpen(false)} className="px-4 py-3 rounded-xl hover:bg-white/5 transition">{t.nav.login}</a>
+                <a href="/auth/register" onClick={() => setMenuOpen(false)} className="px-4 py-3 rounded-xl bg-sky-500/10 text-sky-200 hover:bg-sky-500/15 transition">{t.nav.signupFree}</a>
+              </>
+            )}
             {user && <a href="/dashboard" onClick={() => setMenuOpen(false)} className="px-4 py-3 rounded-xl hover:bg-white/5 transition">{h.account}</a>}
           </div>
         </div>
@@ -347,7 +356,9 @@ export default function Home() {
           {t.hero.title1}<br />
           <span className="bg-gradient-to-r from-pink-400 via-purple-400 to-sky-400 bg-clip-text text-transparent">{t.hero.title2}</span>
         </h1>
-        <p className="text-zinc-300 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed mb-8 sm:mb-10">{t.hero.desc}</p>
+        <p className="text-zinc-300 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed mb-6">{t.hero.desc}</p>
+        <p className="text-cyan-200 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed mb-8 sm:mb-10">{t.hero.quickStart}</p>
+        <a href="/auth/register" className="inline-flex items-center justify-center mx-auto rounded-full bg-gradient-to-r from-sky-500 via-cyan-400 to-blue-400 px-6 py-3 sm:px-8 sm:py-4 text-sm sm:text-base font-black text-slate-950 shadow-[0_20px_70px_-20px_rgba(56,189,248,0.75)] transition hover:opacity-95">{t.hero.startFree}</a>
       </section>
 
       {/* PLATFORM CARDS */}
