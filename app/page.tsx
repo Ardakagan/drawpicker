@@ -255,6 +255,21 @@ const HOME_TEXT: Record<string, any> = {
   },
 };
 
+const PLAN_NAMES: Record<string, Record<string, string>> = {
+  tr: { free: "Ücretsiz", starter: "Bronz", pro: "Gümüş", business: "Altın", diamond: "Pırlanta" },
+  en: { free: "Free", starter: "Bronze", pro: "Silver", business: "Gold", diamond: "Diamond" },
+  de: { free: "Kostenlos", starter: "Bronze", pro: "Silber", business: "Gold", diamond: "Diamant" },
+  zh: { free: "免费", starter: "青铜", pro: "白银", business: "黄金", diamond: "钻石" },
+  ru: { free: "Бесплатный", starter: "Бронза", pro: "Серебро", business: "Золото", diamond: "Бриллиант" },
+  ko: { free: "무료", starter: "브론즈", pro: "실버", business: "골드", diamond: "다이아몬드" },
+  es: { free: "Gratis", starter: "Bronce", pro: "Plata", business: "Oro", diamond: "Diamante" },
+  it: { free: "Gratuito", starter: "Bronzo", pro: "Argento", business: "Oro", diamond: "Diamante" },
+  fr: { free: "Gratuit", starter: "Bronze", pro: "Argent", business: "Or", diamond: "Diamant" },
+  el: { free: "Δωρεάν", starter: "Χάλκινο", pro: "Ασημένιο", business: "Χρυσό", diamond: "Διαμάντι" },
+  pl: { free: "Darmowy", starter: "Brąz", pro: "Srebro", business: "Złoto", diamond: "Diament" },
+  ro: { free: "Gratuit", starter: "Bronz", pro: "Argint", business: "Aur", diamond: "Diamant" },
+};
+
 export default function Home() {
   const [lang, setLang] = useState("tr");
   const [lastDraw, setLastDraw] = useState<LastDraw | null>(null);
@@ -511,10 +526,11 @@ export default function Home() {
             const plan = PLANS[key];
             const price = pricingInterval === "yearly" ? plan.yearlyPrice : plan.monthlyPrice;
             const isPopular = key === "pro";
+            const label = PLAN_NAMES[lang]?.[key] || plan.name;
             return (
               <div key={key} className={`relative bg-[#141421]/90 border rounded-3xl p-6 flex flex-col ${isPopular ? "border-purple-500 shadow-lg shadow-purple-500/20" : "border-white/10"}`}>
                 {isPopular && <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-purple-500 text-white text-xs font-black px-4 py-1 rounded-full whitespace-nowrap">{h.popular}</div>}
-                <div className="font-black text-2xl mb-1">{plan.name}</div>
+                <div className="font-black text-2xl mb-1">{label}</div>
                 <div className="text-4xl font-black mb-1">${price}<span className="text-zinc-500 text-base font-normal">/{pricingInterval === "yearly" ? h.perYear : h.perMonth}</span></div>
                 {pricingInterval === "yearly" && <div className="text-green-400 text-xs mb-3">${Math.round(price / 12)} / {h.perMonth} — {h.save}</div>}
                 <ul className="space-y-2 mb-6 flex-1">
