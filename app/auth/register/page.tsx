@@ -18,11 +18,10 @@ const T: any = {
   el: { title: "Σύνδεση", signUp: "Εγγραφή", login: "Σύνδεση", google: "Συνέχεια με Google", or: "ή", email: "Email", password: "Κωδικός", forgot: "Ξεχάσατε τον κωδικό;", noAccount: "Δεν έχετε λογαριασμό;", hasAccount: "Έχετε ήδη λογαριασμό;", register: "Εγγραφή", verified: "Ο σύνδεσμος εστάλη!", back: "← Πίσω στην αρχική", registerTitle: "Νέος στο DrawPicker;", registerSubtitle: "Δημιούργησε δωρεάν λογαριασμό και ξεκίνα την πρώτη σου κλήρωση.", registerButton: "Δωρεάν έναρξη →" },
 };
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [isSignUp, setIsSignUp] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
@@ -40,18 +39,12 @@ export default function LoginPage() {
     setError("");
     setMessage("");
     const supabase = createClient();
-    if (isSignUp) {
-      const { error } = await supabase.auth.signUp({
-        email, password,
-        options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
-      });
-      if (error) setError(error.message);
-      else setMessage(t.verified);
-    } else {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) setError(error.message);
-      else window.location.href = "/";
-    }
+    const { error } = await supabase.auth.signUp({
+      email, password,
+      options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
+    });
+    if (error) setError(error.message);
+    else setMessage(t.verified);
     setLoading(false);
   }
 
@@ -73,7 +66,7 @@ export default function LoginPage() {
           🎉 <span className="text-sky-400">DrawPicker</span>
         </h1>
         <p className="text-zinc-500 text-center text-sm mb-8">
-          {isSignUp ? t.signUp : t.login}
+          {t.signUp}
         </p>
         <button onClick={handleGoogle}
           className="w-full flex items-center justify-center gap-3 bg-white text-gray-800 font-bold py-3 rounded-xl mb-4 hover:bg-gray-100 transition">
@@ -105,34 +98,14 @@ export default function LoginPage() {
         {message && <p className="text-green-400 text-sm mb-3">✅ {message}</p>}
         <button onClick={handleEmail} disabled={loading}
           className="w-full bg-gradient-to-r from-sky-600 to-sky-500 py-3 rounded-xl font-bold text-sm transition disabled:opacity-50">
-          {loading ? "..." : isSignUp ? t.signUp : t.login}
+          {loading ? "..." : t.signUp}
         </button>
-        <p className="text-center mt-2 mb-2">
-          <a href="/auth/reset" className="text-sky-400 hover:underline text-sm">{t.forgot}</a>
+        <p className="text-center text-zinc-500 text-sm mt-6">
+          {t.hasAccount}{" "}
+          <a href="/auth/login" className="text-sky-400 hover:underline">
+            {t.login}
+          </a>
         </p>
-        {!isSignUp && (
-          <div className="mt-6 pt-6 border-t border-white/10">
-            <div className="relative p-4 rounded-xl border border-sky-500/50 bg-sky-500/5 backdrop-blur-sm hover:border-sky-500 hover:bg-sky-500/10 transition">
-              <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-sky-500 to-transparent opacity-0 group-hover:opacity-5 transition pointer-events-none" />
-              <div className="relative">
-                <div className="text-center text-2xl mb-2">👥</div>
-                <h3 className="text-center font-bold text-white text-sm mb-1">{t.registerTitle}</h3>
-                <p className="text-center text-zinc-400 text-xs mb-3">{t.registerSubtitle}</p>
-                <a href="/auth/register" className="block w-full text-center bg-gradient-to-r from-sky-600 to-sky-500 hover:from-sky-500 hover:to-sky-400 text-white font-bold py-2 rounded-lg text-sm transition">
-                  {t.registerButton}
-                </a>
-              </div>
-            </div>
-          </div>
-        )}
-        {isSignUp && (
-          <p className="text-center text-zinc-500 text-sm mt-6">
-            {t.hasAccount}{" "}
-            <button onClick={() => setIsSignUp(!isSignUp)} className="text-sky-400 hover:underline">
-              {t.login}
-            </button>
-          </p>
-        )}
       </div>
     </main>
   );
