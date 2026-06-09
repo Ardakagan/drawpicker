@@ -3,8 +3,9 @@ import "./globals.css";
 import { Analytics } from "@vercel/analytics/react";
 
 export const metadata: Metadata = {
-  title: "DrawPicker — Sosyal Medya Çekiliş Aracı",
-  description: "Twitter (X) ve YouTube çekilişlerinden adil kazanan seçin.",
+  metadataBase: new URL("https://drawpicker.io"),
+  title: "DrawPicker - Professional Giveaway Platform",
+  description: "Professional giveaway platform for X (Twitter) and YouTube.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
