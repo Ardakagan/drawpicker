@@ -13,6 +13,56 @@ export const LANGS = [
   { code: "ro", name: "Română", flag: "ro" },
 ];
 
+export const STORAGE_LANG_KEY = "dp_lang";
+export const LEGACY_STORAGE_LANG_KEY = "drawpicker_lang";
+export const SUPPORTED_LANGS = LANGS.map((item) => item.code);
+
+export function isSupportedLang(value: string | null | undefined): value is string {
+  return Boolean(value && SUPPORTED_LANGS.includes(value));
+}
+
+export function normalizeBrowserLang(value: string | null | undefined): string | null {
+  if (!value) return null;
+  const normalized = value.trim().toLowerCase();
+  if (!normalized) return null;
+
+  const parts = normalized.split(/[-_]/);
+  const base = parts[0];
+  if (SUPPORTED_LANGS.includes(base)) return base;
+  if (base === "zh") return "zh";
+  return null;
+}
+
+export function getSavedLanguage(): string | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const saved = localStorage.getItem(STORAGE_LANG_KEY) || localStorage.getItem(LEGACY_STORAGE_LANG_KEY);
+    return isSupportedLang(saved) ? saved : null;
+  } catch {
+    return null;
+  }
+}
+
+export function detectBrowserLanguage(): string {
+  if (typeof navigator === "undefined") return "en";
+  const raw = navigator.language || (navigator.languages?.[0] ?? "");
+  return normalizeBrowserLang(raw) || "en";
+}
+
+export function getPreferredLanguage(): string {
+  return getSavedLanguage() || detectBrowserLanguage();
+}
+
+export function savePreferredLanguage(lang: string): void {
+  if (typeof window === "undefined") return;
+  if (!isSupportedLang(lang)) return;
+  try {
+    localStorage.setItem(STORAGE_LANG_KEY, lang);
+  } catch {
+    // ignore
+  }
+}
+
 type Dict = Record<string, string>;
 
 export const T: Record<string, Dict> = {

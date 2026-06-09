@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase-client";
+import { getPreferredLanguage } from "@/lib/i18n";
 
 const T: any = {
   tr: { sub: "Email adresini gir, sıfırlama linki gönderelim.", placeholder: "Email adresin", btn: "Şifre Sıfırlama Linki Gönder", sent: "Email gönderildi!", sentSub: "Emailini kontrol et ve linke tıkla.", back: "← Giriş sayfasına dön" },
@@ -26,8 +27,7 @@ export default function ResetPage() {
   const [lang, setLang] = useState("en");
 
   useEffect(() => {
-    const saved = localStorage.getItem("dp_lang");
-    if (saved && T[saved]) setLang(saved);
+    setLang(getPreferredLanguage());
   }, []);
 
   const t = T[lang] || T.en;

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase-client";
+import { getPreferredLanguage } from "@/lib/i18n";
 
 const T: any = {
   tr: { title: "Giriş Yap", signUp: "Kayıt Ol", login: "Giriş Yap", google: "Google ile devam et", or: "veya", email: "Email", password: "Şifre", forgot: "Şifremi Unuttum?", noAccount: "Hesabın yok mu?", hasAccount: "Zaten hesabın var mı?", register: "Kayıt ol", verified: "Email adresinize doğrulama linki gönderildi!", back: "← Ana Sayfaya Dön", registerTitle: "DrawPicker'a yeni misin?", registerSubtitle: "Ücretsiz hesabını oluştur ve ilk çekilişini başlat.", registerButton: "Ücretsiz başla →" },
@@ -28,8 +29,7 @@ export default function RegisterPage() {
   const [lang, setLang] = useState("en");
 
   useEffect(() => {
-    const saved = localStorage.getItem("dp_lang");
-    if (saved && T[saved]) setLang(saved);
+    setLang(getPreferredLanguage());
   }, []);
 
   const t = T[lang] || T.en;

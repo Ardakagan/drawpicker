@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useParams } from "next/navigation";
-import { tr } from "@/lib/i18n";
+import { getPreferredLanguage, tr } from "@/lib/i18n";
 import LangPicker from "@/components/LangPicker";
 
 type Winner = {
@@ -62,12 +62,7 @@ export default function ResultPage() {
   const t = tr(lang);
 
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem("dp_lang") || localStorage.getItem("drawpicker_lang");
-      if (saved && R[saved]) { setLang(saved); return; }
-    } catch {}
-    const nav = (typeof navigator !== "undefined" ? navigator.language : "")?.slice(0, 2);
-    if (nav && R[nav]) setLang(nav);
+    setLang(getPreferredLanguage());
   }, []);
 
   useEffect(() => {

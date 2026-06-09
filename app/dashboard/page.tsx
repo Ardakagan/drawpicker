@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import { createClient } from "@/lib/supabase-client";
 import { getPlan } from "@/lib/plans";
+import { getPreferredLanguage } from "@/lib/i18n";
 import LangPicker from "@/components/LangPicker";
 
 const D: Record<string, Record<string, string>> = {
@@ -55,10 +56,7 @@ export default function Dashboard() {
   const loc = LOCALE_MAP[lang] || "en-US";
 
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem("dp_lang") || localStorage.getItem("drawpicker_lang");
-      if (saved && D[saved]) setLang(saved);
-    } catch {}
+    setLang(getPreferredLanguage());
 
     const supabase = createClient();
     supabase.auth.getUser().then(async ({ data }) => {

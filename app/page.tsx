@@ -5,6 +5,7 @@ import LangPicker from "@/components/LangPicker";
 import { createClient } from "@/lib/supabase-client";
 import { translations } from "@/lib/translations";
 import { PLANS } from "@/lib/plans";
+import { getPreferredLanguage } from "@/lib/i18n";
 
 type LastDraw = {
   id?: string;
@@ -267,8 +268,7 @@ export default function Home() {
   const h = HOME_TEXT[lang] || HOME_TEXT.en;
 
   useEffect(() => {
-    const saved = localStorage.getItem("dp_lang") || localStorage.getItem("drawpicker_lang");
-    if (saved) setLang(saved);
+    setLang(getPreferredLanguage());
     const supabase = createClient();
     supabase.auth.getUser().then(({ data }) => setUser(data.user));
     fetch("/api/last-draw?t=" + Date.now(), { cache: "no-store" }).then((r) => r.json()).then((d) => { if (d?.lastDraw) setLastDraw(d.lastDraw); }).catch(() => {});

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { PLANS } from "@/lib/plans";
 import { createClient } from "@/lib/supabase-client";
+import { getPreferredLanguage } from "@/lib/i18n";
 import LangPicker from "@/components/LangPicker";
 
 const PT: Record<string, any> = {
@@ -208,10 +209,7 @@ export default function PricingPage() {
   const txt = PT[lang] || PT.en;
 
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem("dp_lang") || localStorage.getItem("drawpicker_lang");
-      if (saved && PT[saved]) setLang(saved);
-    } catch {}
+    setLang(getPreferredLanguage());
 
     const supabase = createClient();
     supabase.auth.getUser().then(async ({ data }) => {

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Flag from "./Flag";
-import { LANGS } from "@/lib/i18n";
+import { LANGS, savePreferredLanguage } from "@/lib/i18n";
 
 export default function LangPicker({
   lang,
@@ -20,7 +20,7 @@ export default function LangPicker({
 
   function handleSelect(code: string) {
     setLang(code);
-    localStorage.setItem("dp_lang", code);
+    savePreferredLanguage(code);
     setOpen(false);
   }
 

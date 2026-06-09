@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import LangPicker from "./LangPicker";
 import Rule from "./Rule";
 import ResultsPanel from "./ResultsPanel";
-import { tr } from "@/lib/i18n";
+import { getPreferredLanguage, tr } from "@/lib/i18n";
 import { createClient } from "@/lib/supabase-client";
 import type { User } from "@/lib/types";
 
@@ -78,8 +78,7 @@ export default function GiveawayPage({ config }: any) {
   const [plan, setPlan] = useState("free");
 
   useEffect(() => {
-    const saved = localStorage.getItem("dp_lang") || localStorage.getItem("drawpicker_lang");
-    if (saved) setLang(saved);
+    setLang(getPreferredLanguage());
     const supabase = createClient();
     supabase.auth.getUser().then(async ({ data }) => {
       setUser(data.user);
